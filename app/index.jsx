@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
+import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal, ActivityIndicator } from 'react-native-paper';
 import { getSetting } from './settings';
 
 export default function Index() {
@@ -31,6 +31,9 @@ export default function Index() {
   // Boolean that indicates if the model is working on a response
   const [loading, setLoading] = useState(false);
 
+  // Error message
+  const [errorMessage, setErrorMessage] = useState("");
+
   // Reference the chat's FlatList
   const chatListRef = useRef();
 
@@ -59,9 +62,10 @@ export default function Index() {
         if (data.models[i].name === selectedModel)
           containsModel = true;
       if (!containsModel) setSelectedModel("");
+      setErrorMessage("");
 
     } catch (error) {
-      console.error("Error:", error);
+      setErrorMessage("The connection failed. Make sure the IP address is correct.");
       setModels("");
       setSelectedModel("");
     }
@@ -106,9 +110,10 @@ export default function Index() {
 
         // Add response to the chat
         setChat([...chat, userMessage, data.message]);
+        setErrorMessage("");
 
       } catch (error) {
-        console.error("Error:", error);
+        setErrorMessage("The connection failed. Make sure the IP address is correct.");
       } finally {
 
         // Scroll to response
@@ -168,6 +173,14 @@ export default function Index() {
         </View>
 
         <View style={styles.chat}>
+
+          {errorMessage !== "" ? (
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            ) : (
+              <></>
+            )
+          }
+
           <FlatList
             ref={chatListRef}
             data={chat}
@@ -193,6 +206,12 @@ export default function Index() {
       </View>
 
       <View style={styles.controls}>
+        {loading ? (
+            <ActivityIndicator style={{ marginLeft: 10 }} />
+          ) : (
+            <></>
+          )
+        }
         <TextInput
           style={styles.input}
           contentStyle={styles.inputValue}
@@ -278,4 +297,11 @@ const styles = StyleSheet.create({
   bubbleLabel: {
     fontFamily: "Outfit-Regular",
   },
+  errorMessage: {
+    flex: 0,
+    fontFamily: "Outfit-Regular",
+    fontSize: 14,
+    textAlign: "center",
+    color: "red"
+  }
 });
