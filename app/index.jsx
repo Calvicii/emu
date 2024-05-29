@@ -1,27 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { View, StatusBar, StyleSheet, FlatList } from "react-native";
-import {
-  useTheme,
-  TextInput,
-  Text,
-  IconButton,
-  Button,
-  Surface,
-} from "react-native-paper";
+import React, { useEffect, useState, useRef } from 'react';
+import { View, StatusBar, StyleSheet, FlatList } from 'react-native';
+import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
+import { useFonts } from 'expo-font';
 
 export default function Index() {
+
+  // For global theming
   const theme = useTheme();
+
+  // For the modal's functions
+  const [visible, setVisible] = React.useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
+  // Available models
   const [models, setModels] = useState([]);
+
+  // The user's current prompt
   const [prompt, setPrompt] = useState("");
+
+  // The selected model to chat with
   const [selectedModel, setSelectedModel] = useState("");
+
+  // The chat (includes user's chat and the model's chat)
   const [chat, setChat] = useState([]);
+
+  // Boolean that indicates if the model is working on a response
   const [loading, setLoading] = useState(false);
 
+  // Reference the chat's FlatList
+  const chatListRef = useRef()
+
+  // Grab models on refresh
   useEffect(() => {
     getModels();
     console.log("refresh");
   }, []);
 
+  // Grab the models available on the machine
   async function getModels() {
     try {
       const response = await fetch("http://192.168.0.2:11434/api/tags");
@@ -33,15 +49,26 @@ export default function Index() {
   }
 
   async function sendPrompt() {
-    setPrompt("");
     if (prompt !== "" && selectedModel !== "") {
-      console.log("Sent prompt: " + prompt);
+
+      // Reset the TextInput
+      setPrompt("");
+
+      // Scroll to the message that was sent
+      chatListRef.current.scrollToEnd();
+
+      // Format the user's prompt
       let userMessage = {
         role: "user",
         content: prompt,
       };
+
+      // Add it to the chat
       setChat([...chat, userMessage]);
+
+      // Set loading to disable inputs
       setLoading(true);
+
       try {
         const response = await fetch("http://192.168.0.2:11434/api/chat", {
           method: "POST",
@@ -54,69 +81,100 @@ export default function Index() {
             stream: false,
           }),
         });
+
+        // Receive the data
         const data = await response.json();
+
+        // Add response to the chat
         setChat([...chat, userMessage, data.message]);
+
       } catch (error) {
         console.error("Error:", error);
       } finally {
+
+        // Scroll to response
+        chatListRef.current.scrollToEnd();
+
+        // Set loading to enable inputs
         setLoading(false);
       }  
     }
   }
 
   return (
-    <View
-      style={{
-        backgroundColor: theme.colors.background,
-        flex: 1,
-      }}
-    >
-      <StatusBar backgroundColor={theme.colors.background} />
-      <View style={styles.window}>
-        <View style={styles.options}>
-          <Text style={styles.selectedMode}>{selectedModel}</Text>
-
-          <View style={styles.modelList}>
-            {models.length > 0 ? (
-              <FlatList
-                data={models}
-                keyExtractor={(item) => item.name}
-                renderItem={({ item }) => (
-                  <Button onPress={() => setSelectedModel(item.name)}>
-                    {item.name}
-                  </Button>
-                )}
-              />
+    <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal}>
+          {models.length > 0 ? (
+            <FlatList
+              style={styles.modelList}
+              data={models}
+              keyExtractor={(item) => item.name}
+              renderItem={({ item }) => (
+                <Button
+                  labelStyle={styles.modelListLabel}
+                  onPress={() => {
+                    setSelectedModel(item.name);
+                    hideModal();
+                  }}
+                >
+                  {item.name}
+                </Button>
+              )}
+            />
             ) : (
-              <Text>No models available</Text>
-            )}
-          </View>
+              <Text style={styles.modelListLabel}>No models available</Text>
+            )
+          }
+        </Modal>
+      </Portal>
+
+      <View style={styles.window}>
+
+        <View style={styles.options}>
+
+        {selectedModel === "" ? (
+              <Button style={styles.selectedMode} onPress={showModal} labelStyle={styles.selectedModeLabel}>
+                Select a model
+              </Button>
+          ) : (
+            <Button style={styles.selectedMode} onPress={showModal} labelStyle={styles.selectedModeLabel}>
+              {selectedModel}
+            </Button>
+          )
+        }
+
         </View>
+
         <View style={styles.chat}>
           <FlatList
+            ref={chatListRef}
             data={chat}
             renderItem={({ item }) => {
               if (item.role === "assistant") {
                 return (
                   <Surface style={styles.modelBubble} mode="flat">
-                    <Text>{item.content}</Text>
+                    <Text style={styles.bubbleLabel}>{item.content}</Text>
                   </Surface>
                 );
               }
               if (item.role === "user") {
                 return (
                   <Surface style={styles.userBubble} mode="elevated">
-                    <Text>{item.content}</Text>
+                    <Text style={styles.bubbleLabel}>{item.content}</Text>
                   </Surface>
                 );
               }
             }}
           />
         </View>
+
       </View>
+
       <View style={styles.controls}>
         <TextInput
           style={styles.input}
+          contentStyle={styles.inputValue}
           mode="outlined"
           placeholder={"Message " + selectedModel}
           value={prompt}
@@ -131,6 +189,7 @@ export default function Index() {
           onPress={sendPrompt}
         />
       </View>
+      
     </View>
   );
 }
@@ -141,7 +200,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   options: {
-    flex: 1,
+    flex: 0,
     paddingVertical: 10,
     borderBottomWidth: 2,
     borderColor: "white"
@@ -154,22 +213,32 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
   },
+  inputValue: {
+    fontFamily: "Outfit-Regular",
+  },
   sendButton: {
     marginLeft: 15,
   },
   selectedMode: {
-    flex: 1,
-    textAlign: "center",
+    margin: "auto",
+    width: "50%",
+  },
+  selectedModeLabel: {
+    fontFamily: "Outfit-Medium",
     fontSize: 20,
-    fontWeight: "bold",
   },
   modelList: {
-    flex: 2,
     width: "50%",
     margin: "auto",
+    padding: 10,
+    backgroundColor: '#444',
+    borderRadius: 10,
+  },
+  modelListLabel: {
+    fontFamily: "Outfit-Regular",
   },
   chat: {
-    flex: 4,
+    flex: 1,
   },
   modelBubble: {
     marginRight: 100,
@@ -183,6 +252,9 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#444"
+    backgroundColor: "#444",
+  },
+  bubbleLabel: {
+    fontFamily: "Outfit-Regular",
   },
 });
