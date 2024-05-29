@@ -1,6 +1,7 @@
 import { Link, Stack, router } from 'expo-router';
-import { MD3DarkTheme, PaperProvider, IconButton, Icon } from 'react-native-paper';
-import { useFonts } from 'expo-font'
+import { View } from 'react-native';
+import { MD3DarkTheme, PaperProvider, IconButton, ActivityIndicator } from 'react-native-paper';
+import { useFonts } from 'expo-font';
 
 const theme = {
   ...MD3DarkTheme,
@@ -26,6 +27,15 @@ export default function RootLayout() {
     'Outfit-SemiBold': require('../assets/fonts/Outfit-SemiBold.ttf'),
     'Outfit-Thin': require('../assets/fonts/Outfit-Thin.ttf'),
   });
+
+  // Show a loading screen if the fonts have not loaded yet
+  if (!fontsLoaded) {
+    return (
+      <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
+        <ActivityIndicator style={{ flex: 1 }} animating={true} size="large" color="white" />
+      </View>
+    );
+  }
 
   return (
     <PaperProvider theme={theme}>

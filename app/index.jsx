@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StatusBar, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
-import { useFonts } from 'expo-font';
+import { getSetting } from './settings';
 
 export default function Index() {
 
   // For global theming
   const theme = useTheme();
+
+  // Ollama server's ip
+  const [ip, setIp] = useState("");
 
   // For the modal's functions
   const [visible, setVisible] = React.useState(false);
@@ -29,22 +32,38 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
 
   // Reference the chat's FlatList
-  const chatListRef = useRef()
+  const chatListRef = useRef();
 
-  // Grab models on refresh
+  // Grab models and settings on modal show/hide
   useEffect(() => {
     getModels();
     console.log("refresh");
-  }, []);
+
+    async function fetchSettings() {
+      const savedIp = await getSetting("ip");
+      setIp(savedIp);
+    }
+    fetchSettings();
+  }, [visible]);
 
   // Grab the models available on the machine
   async function getModels() {
     try {
-      const response = await fetch("http://192.168.0.2:11434/api/tags");
+      const response = await fetch(`http://${ip}/api/tags`);
       const data = await response.json();
       setModels(data.models);
+
+      // Deselect the current model if it is not available on the server
+      let containsModel = false
+      for (let i = 0; i < data.models.length; ++i)
+        if (data.models[i].name === selectedModel)
+          containsModel = true;
+      if (!containsModel) setSelectedModel("");
+
     } catch (error) {
       console.error("Error:", error);
+      setModels("");
+      setSelectedModel("");
     }
   }
 
@@ -70,7 +89,7 @@ export default function Index() {
       setLoading(true);
 
       try {
-        const response = await fetch("http://192.168.0.2:11434/api/chat", {
+        const response = await fetch(`http://${ip}/api/chat`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -123,7 +142,9 @@ export default function Index() {
               )}
             />
             ) : (
-              <Text style={styles.modelListLabel}>No models available</Text>
+              <View style={styles.modelList}>
+                <Text style={styles.modelListLabel}>No models available</Text>
+              </View>
             )
           }
         </Modal>
