@@ -6,15 +6,16 @@ import {
   Text,
   IconButton,
   Button,
-  Surface
+  Surface,
 } from "react-native-paper";
 
 export default function Index() {
   const theme = useTheme();
   const [models, setModels] = useState([]);
   const [prompt, setPrompt] = useState("");
-  const [selectedModel, setSelectedModel] = useState("No model selected");
+  const [selectedModel, setSelectedModel] = useState("");
   const [chat, setChat] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getModels();
@@ -32,29 +33,34 @@ export default function Index() {
   }
 
   async function sendPrompt() {
-    console.log("Sent prompt: " + prompt);
-    let userMessage = {
-      role: "user",
-      content: prompt
-    }
-    setChat([...chat, userMessage]);
-    try {
-      const response = await fetch("http://192.168.0.2:11434/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: selectedModel,
-          messages: [...chat, userMessage],
-          stream: false,
-        }),
-      });
-      const data = await response.json();
-      setChat([...chat, userMessage, data.message]);
-      console.log(chat);
-    } catch (error) {
-      console.error("Error:", error);
+    setPrompt("");
+    if (prompt !== "" && selectedModel !== "") {
+      console.log("Sent prompt: " + prompt);
+      let userMessage = {
+        role: "user",
+        content: prompt,
+      };
+      setChat([...chat, userMessage]);
+      setLoading(true);
+      try {
+        const response = await fetch("http://192.168.0.2:11434/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: selectedModel,
+            messages: [...chat, userMessage],
+            stream: false,
+          }),
+        });
+        const data = await response.json();
+        setChat([...chat, userMessage, data.message]);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }  
     }
   }
 
@@ -68,7 +74,6 @@ export default function Index() {
       <StatusBar backgroundColor={theme.colors.background} />
       <View style={styles.window}>
         <View style={styles.options}>
-
           <Text style={styles.selectedMode}>{selectedModel}</Text>
 
           <View style={styles.modelList}>
@@ -87,7 +92,6 @@ export default function Index() {
             )}
           </View>
         </View>
-        
         <View style={styles.chat}>
           <FlatList
             data={chat}
@@ -101,7 +105,7 @@ export default function Index() {
               }
               if (item.role === "user") {
                 return (
-                  <Surface style={styles.userBubble} mode="flat">
+                  <Surface style={styles.userBubble} mode="elevated">
                     <Text>{item.content}</Text>
                   </Surface>
                 );
@@ -109,20 +113,21 @@ export default function Index() {
             }}
           />
         </View>
-
       </View>
       <View style={styles.controls}>
         <TextInput
           style={styles.input}
           mode="outlined"
-          placeholder="Message Ollama"
+          placeholder={"Message " + selectedModel}
           value={prompt}
+          disabled={loading}
           onChangeText={(val) => setPrompt(val)}
         />
         <IconButton
           style={styles.sendButton}
           mode="contained"
           icon="arrow-up"
+          disabled={loading}
           onPress={sendPrompt}
         />
       </View>
@@ -138,6 +143,8 @@ const styles = StyleSheet.create({
   options: {
     flex: 1,
     paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderColor: "white"
   },
   controls: {
     flexDirection: "row",
@@ -169,11 +176,13 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     borderRadius: 10,
+    backgroundColor: "#333",
   },
   userBubble: {
     marginLeft: 100,
     margin: 10,
     padding: 10,
     borderRadius: 10,
-  }
+    backgroundColor: "#444"
+  },
 });
