@@ -114,6 +114,7 @@ export default function Index() {
 
       } catch (error) {
         setErrorMessage("The connection failed. Make sure the IP address is correct.");
+        console.error(error);
       } finally {
 
         // Scroll to response
