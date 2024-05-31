@@ -114,7 +114,6 @@ export default function Index() {
 
       } catch (error) {
         setErrorMessage("The connection failed. Make sure the IP address is correct.");
-        console.error(error);
       } finally {
 
         // Scroll to response
@@ -207,12 +206,6 @@ export default function Index() {
       </View>
 
       <View style={styles.controls}>
-        {loading ? (
-            <ActivityIndicator style={{ marginLeft: 10 }} />
-          ) : (
-            <></>
-          )
-        }
         <TextInput
           style={styles.input}
           contentStyle={styles.inputValue}
@@ -227,6 +220,7 @@ export default function Index() {
           mode="contained"
           icon="arrow-up"
           disabled={loading}
+          loading={loading}
           onPress={sendPrompt}
         />
       </View>

@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#333"
-      }
+      },
+      "package": "com.calvicii.alpaca_mobile"
     },
     "web": {
       "bundler": "metro",
@@ -42,12 +43,20 @@
             "./assets/fonts/Outfit-Regular.ttf",
             "./assets/fonts/Outfit-SemiBold.ttf",
             "./assets/fonts/Outfit-Thin.ttf"
-        ]
+          ]
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "af91d453-7cb6-4dcf-8cd4-ce7aa9393d23"
+      }
     }
   }
 }

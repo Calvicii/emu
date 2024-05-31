@@ -1,7 +1,12 @@
-import { Link, Stack, router } from 'expo-router';
+import 'react-native-gesture-handler';
+import { Drawer } from 'react-native-drawer-layout';
+import { useState } from 'react';
 import { View } from 'react-native';
-import { MD3DarkTheme, PaperProvider, IconButton, ActivityIndicator } from 'react-native-paper';
+import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button } from 'react-native-paper';
+import { Link, Stack, router } from 'expo-router';
 import { useFonts } from 'expo-font';
+import Index from './index';
+import Settings from './settings';
 
 const theme = {
   ...MD3DarkTheme,
@@ -14,6 +19,8 @@ const theme = {
 };
 
 export default function RootLayout() {
+
+  const [open, setOpen] = useState(false);
 
   const [fontsLoaded] = useFonts({
     'Outfit': require('../assets/fonts/Outfit-VariableFont.ttf'),
@@ -38,58 +45,100 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={theme}>
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "New Chat",
-            statusBarColor: theme.colors.background,
-            headerStyle: {
-              backgroundColor: theme.colors.header,
-            },
-            headerTitleStyle: {
-              fontFamily: "Outfit-Bold",
-              color: theme.colors.primary,
-            },
-            headerLeft: () => (
-              <IconButton
-                iconColor="white"
-                icon="menu"
-              />
-            ),
-            headerRight: () => (
-              <Link href="settings" asChild>
-                <IconButton
-                  iconColor="white"
-                  icon="cog"
-                />
-              </Link>
-            ),
+      <PaperProvider theme={theme}>
+        <Drawer
+          drawerType="slide"
+          drawerStyle={{
+            backgroundColor: theme.colors.background,
+            width: 250,
           }}
-        />
-        <Stack.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            statusBarColor: theme.colors.background,
-            headerStyle: {
-              backgroundColor: theme.colors.header,
-            },
-            headerTitleStyle: {
-              fontFamily: "Outfit-Bold",
-              color: theme.colors.primary,
-            },
-            headerLeft: () => (
-              <IconButton
-                iconColor="white"
-                icon="arrow-left"
-                onPress={() => router.back()}
-              />
-            ),
+          open={open}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          renderDrawerContent={() => {
+            return (
+              <View
+                style={{
+                  flex: 1,
+                  padding: 10,
+                  paddingTop: 5,
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                  }}
+                >
+                  <Button
+                    mode="outlined"
+                    icon="plus"
+                    textColor={theme.colors.primary}
+                    onPress={() => console.log("New Chat")}
+                  >
+                    New Chat
+                  </Button>
+                </View>
+                <Link href="settings" asChild>
+                  <Button
+                    style={{
+                      flex: 0,
+                    }}
+                    mode="contained-tonal"
+                    icon="cog"
+                    onPress={() => setOpen(false)}
+                  >
+                    Settings
+                  </Button>
+                </Link>
+              </View>
+            );
           }}
-        />
-      </Stack>
-    </PaperProvider>
+        >
+          <Stack>
+            <Stack.Screen
+              name="index"
+              options={{
+                title: "New Chat",
+                statusBarColor: theme.colors.background,
+                headerStyle: {
+                  backgroundColor: theme.colors.header,
+                },
+                headerTitleStyle: {
+                  fontFamily: "Outfit-Bold",
+                  color: theme.colors.primary,
+                },
+                headerLeft: () => (
+                  <IconButton
+                    iconColor="white"
+                    icon="menu"
+                    onPress={() => setOpen(true)}
+                  />
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="settings"
+              options={{
+                title: "Settings",
+                statusBarColor: theme.colors.background,
+                headerStyle: {
+                  backgroundColor: theme.colors.header,
+                },
+                headerTitleStyle: {
+                  fontFamily: "Outfit-Bold",
+                  color: theme.colors.primary,
+                },
+                headerLeft: () => (
+                  <IconButton
+                    iconColor="white"
+                    icon="arrow-left"
+                    onPress={() => router.back()}
+                  />
+                ),
+              }}
+            />
+          </Stack>
+        </Drawer>
+      </PaperProvider>
   );
 }
