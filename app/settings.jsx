@@ -50,6 +50,7 @@ export default function Settings() {
           mode="outlined"
           label="Ollama Server's IP"
           placeholder="127.0.0.1:11434"
+          contentStyle={{ fontFamily: "Outfit-Regular" }}
           value={ip}
           onChangeText={(val) => changeIp(val)}
         />

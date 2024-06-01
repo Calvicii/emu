@@ -43,7 +43,6 @@ export default function Index() {
         const chatIndex = chats.findIndex(chat => chat.id === parseInt(chatId));
         if (chatIndex !== -1) {
           const messages = chats[chatIndex].messages;
-          console.log(messages);
           setChat(messages);
         }
       }      
@@ -110,7 +109,9 @@ export default function Index() {
           role: "user",
           content: prompt,
         };
-  
+        
+        setChat([...chat, userMessage])
+
         // Send the request to the server
         const response = await fetch(`http://${ip}/api/chat`, {
           method: "POST",
@@ -133,7 +134,7 @@ export default function Index() {
         const data = await response.json();
   
         // Update the chat state with the response and user's message
-        setChat(prevChat => [...prevChat, userMessage, data.message]);
+        setChat(prevChat => [...prevChat, data.message]);
   
         // Store the updated chat state
         storeChatMessages(chatId, [...chat, userMessage, data.message]);
@@ -247,6 +248,7 @@ export default function Index() {
             style={styles.input}
             contentStyle={styles.inputValue}
             mode="outlined"
+            multiline={true}
             placeholder={"Message " + selectedModel}
             value={prompt}
             disabled={loading}
@@ -287,6 +289,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inputValue: {
+    flex: 1,
+    marginTop: 16,
     fontFamily: "Outfit-Regular",
   },
   sendButton: {

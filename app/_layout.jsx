@@ -138,6 +138,7 @@ export default function RootLayout() {
                 <Button
                   mode="outlined"
                   icon="plus"
+                  labelStyle={{ fontFamily: "Outfit-Regular" }}
                   textColor={theme.colors.primary}
                   onPress={async () => {
                     const newChatId = await newChat();
@@ -154,6 +155,7 @@ export default function RootLayout() {
                     <View style={styles.chatItem}>
                       <Button
                         style={{ flex: 1 }}
+                        labelStyle={{ fontFamily: "Outfit-Regular" }}
                         mode="outlined"
                         textColor={theme.colors.primary}
                         onPress={() => {
@@ -190,6 +192,7 @@ export default function RootLayout() {
               <Link href="settings" asChild>
                 <Button
                   style={styles.navSettings}
+                  labelStyle={{ fontFamily: "Outfit-Regular" }}
                   mode="contained-tonal"
                   icon="cog"
                   onPress={() => setOpen(false)}
@@ -263,8 +266,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chatItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   navSettings: {
     flex: 0,
