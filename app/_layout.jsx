@@ -142,6 +142,13 @@ export default function RootLayout() {
                   textColor={theme.colors.primary}
                   onPress={async () => {
                     const newChatId = await newChat();
+                    setOpen(false);
+                    router.navigate({
+                      pathname: "",
+                      params: {
+                        chatId: newChatId,
+                      }
+                    })
                   }}
                 >
                   New Chat

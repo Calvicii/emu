@@ -33,31 +33,6 @@ export default function Index() {
   // The chat (includes user's chat and the model's chat)
   const [chat, setChat] = useState([]);
 
-  // Refresh the model list and grab the chat from storage
-  useEffect(() => {
-    console.log("refresh");
-  
-    if (chatId !== undefined) {
-      async function retrieveChat() {
-        const chats = await getChats();
-        const chatIndex = chats.findIndex(chat => chat.id === parseInt(chatId));
-        if (chatIndex !== -1) {
-          const messages = chats[chatIndex].messages;
-          setChat(messages);
-        }
-      }      
-      retrieveChat();
-
-      getModels();
-
-      async function fetchSettings() {
-        const savedIp = await getSetting("ip");
-        setIp(savedIp);
-      }
-      fetchSettings();
-    }
-  }, [chatId, visible]);  
-
   // Boolean that indicates if the model is working on a response
   const [loading, setLoading] = useState(false);
 
@@ -69,6 +44,39 @@ export default function Index() {
 
   // Error messages
   const connErr = "Connection failed. Make sure the IP address is correct.";
+
+  // Refresh the model list and grab the chat from storage
+  useEffect(() => {
+    console.log("refresh");
+  
+    if (chatId !== undefined) {
+
+      // Retrieve the chat
+      async function retrieveChat() {
+        const chats = await getChats();
+        const chatIndex = chats.findIndex(chat => chat.id === parseInt(chatId));
+        if (chatIndex !== -1) {
+          const messages = chats[chatIndex].messages;
+          setChat(messages);
+        }
+      }      
+      retrieveChat();
+
+      // Refresh the list of models
+      getModels();
+
+      async function fetchSettings() {
+        const savedIp = await getSetting("ip");
+        setIp(savedIp);
+      }
+      fetchSettings();
+    }
+  }, [chatId, visible]);
+
+  useEffect(() => {
+    // TODO: Scroll to the bottom of the chat
+    // chatListRef.current.scrollToEnd();
+  }, [chatId]);
 
   // Grab the models available on the machine
   async function getModels() {
