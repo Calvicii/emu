@@ -38,9 +38,7 @@ export async function storeChats(chats) {
 export async function storeChatMessages(chatId, messages) {
   try {
     let chats = await getChats();
-    console.log("Existing chats:", chats);
     const chatIndex = chats.findIndex(chat => chat.id === parseInt(chatId));
-    console.log("Chat index:", chatIndex);
     if (chatIndex !== -1) {
       chats[chatIndex].messages = messages;
       await storeChats(chats);

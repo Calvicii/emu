@@ -73,11 +73,6 @@ export default function Index() {
     }
   }, [chatId, visible]);
 
-  useEffect(() => {
-    // TODO: Scroll to the bottom of the chat
-    // chatListRef.current.scrollToEnd();
-  }, [chatId]);
-
   // Grab the models available on the machine
   async function getModels() {
     try {
@@ -110,7 +105,7 @@ export default function Index() {
         setLoading(true);
   
         // Scroll to the message that was sent
-        chatListRef.current.scrollToEnd();
+        chatListRef.current.scrollToOffset({ animated: true, offset: 0 });
   
         // Create the user's message object
         const userMessage = {
@@ -154,7 +149,7 @@ export default function Index() {
         setErrorMessage(connErr);
       } finally {
         // Scroll to response
-        chatListRef.current.scrollToEnd();
+        chatListRef.current.scrollToOffset({ animated: true, offset: 0 });
   
         // Set loading to enable inputs
         setLoading(false);
@@ -226,8 +221,9 @@ export default function Index() {
             }
   
             <FlatList
+              inverted
               ref={chatListRef}
-              data={chat}
+              data={[...chat].reverse()}
               renderItem={({ item }) => {
                 if (item !== undefined) {
                   if (item.role === "assistant") {
