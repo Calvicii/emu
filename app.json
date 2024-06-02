@@ -4,7 +4,7 @@
     "slug": "alpaca_mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/com.jeffser.Alpaca.png",
+    "icon": "./assets/images/emu.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/emu.png",
         "backgroundColor": "#333"
       },
       "package": "com.calvicii.alpaca_mobile"
@@ -26,7 +26,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/com.jeffser.Alpaca.png"
+      "favicon": "./assets/images/emu.png"
     },
     "plugins": [
       "expo-router",
