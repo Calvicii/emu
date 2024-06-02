@@ -2,8 +2,8 @@ import 'react-native-gesture-handler';
 import { Drawer } from 'react-native-drawer-layout';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Divider } from 'react-native-paper';
+import { View, StyleSheet, FlatList, Vibration } from 'react-native';
+import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Divider, Menu, Portal, Modal, TextInput } from 'react-native-paper';
 import { Link, Stack, router } from 'expo-router';
 import { useFonts } from 'expo-font';
 
@@ -35,15 +35,15 @@ export async function storeChats(chats) {
   }
 }
 
-export async function storeChatMessages(chatId, messages) {
+export async function storeChatMessages(id, messages) {
   try {
     let chats = await getChats();
-    const chatIndex = chats.findIndex(chat => chat.id === parseInt(chatId));
+    const chatIndex = chats.findIndex(chat => chat.id === parseInt(id));
     if (chatIndex !== -1) {
       chats[chatIndex].messages = messages;
       await storeChats(chats);
     } else {
-      console.error(`Chat with id ${chatId} not found.`);
+      console.error(`Chat with id ${id} not found.`);
     }
   } catch (error) {
     console.error("Error:", error);
@@ -60,12 +60,63 @@ export async function deleteChat(id) {
   }
 }
 
+export async function renameChat(id, name) {
+  try {
+    const chats = await getChats();
+    const chatIndex = chats.findIndex(chat => chat.id === parseInt(id));
+    if (chatIndex !== -1) {
+      chats[chatIndex].name = name;
+      await storeChats(chats)
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+export async function getChatName(id) {
+  try {
+    const chats = await getChats();
+    const chatIndex = chats.findIndex(chat => chat.id === parseInt(id));
+    if (chatIndex !== -1)
+      return chats[chatIndex].name;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
 export default function RootLayout() {
 
+  // Selected chat's ID
   const [currentChatId, setCurrentChatId] = useState();
 
+  // Selected chat's name
+  const [currentChatName, setCurrentChatName] = useState("");
+
+  // To open/close the drawer
   const [open, setOpen] = useState(false);
+
+  // To open/close the rename window
+  const [visibleRename, setVisibleRename] = useState(false);
+  function showRename(id) {
+    setRenameChatId(id);
+    console.log(renameChatId);
+    setVisibleMenuId(null);
+    setVisibleRename(true);
+  };
+  function hideRename() {
+    setVisibleRename(false);
+    setRenameChatId(null);
+  };
+
+  // To rename a chat
+  const [renameChatId, setRenameChatId] = useState(null);
+  const [newChatName, setNewChatName] = useState("");
+
+  // All stored chats
   const [chats, setChats] = useState([]);
+
+  // For managing visible menu
+  const [visibleMenuId, setVisibleMenuId] = useState(null);
   
   const [fontsLoaded] = useFonts({
     'Outfit': require('../assets/fonts/Outfit-VariableFont.ttf'),
@@ -100,13 +151,11 @@ export default function RootLayout() {
   async function newChat() {
     let chats = await getChats();
     let newChatId;
-    if (chats.length === 0) {
+    if (chats.length === 0)
       newChatId = 0;
-      chats.push({ id: newChatId, messages: [] });
-    } else {
+    else
       newChatId = chats[chats.length - 1].id + 1;
-      chats.push({ id: newChatId, messages: [] });
-    }
+    chats.push({ id: newChatId, name: "New Chat", messages: [] });
     await storeChats(chats);
     setChats(chats);
     return newChatId;
@@ -116,7 +165,31 @@ export default function RootLayout() {
     await deleteChat(id);
     const updatedChats = await getChats();
     setChats(updatedChats);
+    if (currentChatId === id)
+      setCurrentChatName("");
+      router.navigate({
+        pathname: "",
+        params: {
+          chatId: undefined,
+        }
+      });
   }
+
+  async function handleRenameChat(id, name) {
+    await renameChat(id, name);
+    const updatedChats = await getChats();
+    setChats(updatedChats);
+    if (currentChatId === id)
+      setCurrentChatName(name);
+    hideRename();
+  }
+
+  const handleLongPress = (id) => {
+    Vibration.vibrate(1);
+    setVisibleMenuId(id);
+  };
+
+  const handleCloseMenu = () => setVisibleMenuId(null);
 
   return (
     <PaperProvider theme={theme}>
@@ -141,12 +214,13 @@ export default function RootLayout() {
                   onPress={async () => {
                     const newChatId = await newChat();
                     setOpen(false);
+                    setCurrentChatName("New Chat");
                     router.navigate({
                       pathname: "",
                       params: {
                         chatId: newChatId,
                       }
-                    })
+                    });
                   }}
                 >
                   New Chat
@@ -158,38 +232,39 @@ export default function RootLayout() {
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
                     <View style={styles.chatItem}>
-                      <Button
-                        style={{ flex: 1 }}
-                        labelStyle={{ fontFamily: "Outfit-Regular" }}
-                        mode="outlined"
-                        textColor={theme.colors.primary}
-                        onPress={() => {
-                          setOpen(false);
-                          setCurrentChatId(item.id);
-                          router.navigate({
-                            pathname: "",
-                            params: {
-                              chatId: item.id,
-                            }
-                          })
-                        }}
+                      <Menu
+                      contentStyle={styles.menu}
+                        visible={visibleMenuId === item.id}
+                        onDismiss={handleCloseMenu}
+                        anchor={
+                          <Button
+                            labelStyle={{ fontFamily: "Outfit-Regular" }}
+                            mode="outlined"
+                            textColor={theme.colors.primary}
+                            onLongPress={() => handleLongPress(item.id)}
+                            onPress={() => {
+                              setOpen(false);
+                              setCurrentChatId(item.id);
+                              async function setCurrentName() {
+                                let name = await getChatName(item.id);
+                                setCurrentChatName(name);
+                              }
+                              setCurrentName();
+                              router.navigate({
+                                pathname: "",
+                                params: {
+                                  chatId: item.id,
+                                }
+                              });
+                            }}
+                          >
+                            {item.name}
+                          </Button>
+                        }
                       >
-                        Chat {item.id}
-                      </Button>
-                      <IconButton
-                        icon="delete"
-                        iconColor={theme.colors.primary}
-                        onPress={() => {
-                          handleDeleteChat(item.id);
-                          setCurrentChatId(undefined);
-                          router.navigate({
-                            pathname: "",
-                            params: {
-                              chatId: undefined,
-                            }
-                          })
-                        }}
-                      />
+                        <Menu.Item onPress={() => showRename(item.id)} title="Rename" leadingIcon="pencil" />
+                        <Menu.Item onPress={() => handleDeleteChat(item.id)} title="Delete" leadingIcon="delete" />
+                      </Menu>
                     </View>
                   )}
                 />
@@ -205,6 +280,38 @@ export default function RootLayout() {
                   Settings
                 </Button>
               </Link>
+              <Portal>
+                <Modal visible={visibleRename} onDismiss={hideRename}>
+                  <View style={styles.renameWindow}>
+                    <TextInput
+                      style={styles.renameInput}
+                      mode="outlined"
+                      label="Rename"
+                      onChangeText={(val) => setNewChatName(val)}
+                    />
+                    <View style={{ flexDirection: "row", marginTop: 10 }}>
+                      <Button
+                        style={styles.confirmButton}
+                        mode="contained-tonal"
+                        onPress={() => {
+                          handleRenameChat(renameChatId, newChatName);
+                          setRenameChatId(null);
+                          setNewChatName("");
+                        }}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        style={styles.cancelButton}
+                        mode="outlined"
+                        onPress={hideRename}
+                      >
+                        Cancel
+                      </Button>
+                    </View>
+                  </View>
+                </Modal>
+              </Portal>
             </View>
           );
         }}
@@ -216,7 +323,7 @@ export default function RootLayout() {
               currentChatId: 1,
             }}
             options={{
-              title: "Chat " + currentChatId,
+              title: currentChatName,
               statusBarColor: theme.colors.background,
               headerStyle: {
                 backgroundColor: theme.colors.header,
@@ -271,8 +378,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chatItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    marginBottom: 5,
   },
   navSettings: {
     flex: 0,
@@ -283,5 +389,28 @@ const styles = StyleSheet.create({
   },
   chatList: {
     marginBottom: 10,
+  },
+  menu: {
+    backgroundColor: theme.colors.header,
+    borderRadius: 10,
+  },
+  renameWindow: {
+    margin: "auto",
+    padding: 10,
+    width: "75%",
+    height: 125,
+    backgroundColor: theme.colors.header,
+    borderRadius: 10,
+  },
+  renameInput: {
+    backgroundColor: theme.colors.header,
+  },
+  confirmButton: {
+    flex: 1,
+    marginRight: 5,
+  },
+  cancelButton: {
+    flex: 1,
+    marginLeft: 5,
   }
 });

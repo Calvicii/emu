@@ -17,9 +17,9 @@ export default function Index() {
   const [ip, setIp] = useState("");
 
   // For the modal's functions
-  const [visible, setVisible] = React.useState(false);
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
+  const [visibleModal, setVisibleModal] = React.useState(false);
+  const showModal = () => setVisibleModal(true);
+  const hideModal = () => setVisibleModal(false);
 
   // Available models
   const [models, setModels] = useState([]);
@@ -71,7 +71,7 @@ export default function Index() {
       }
       fetchSettings();
     }
-  }, [chatId, visible]);
+  }, [chatId, visibleModal]);
 
   // Grab the models available on the machine
   async function getModels() {
@@ -167,7 +167,7 @@ export default function Index() {
     return (
       <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
         <Portal>
-          <Modal visible={visible} onDismiss={hideModal}>
+          <Modal visible={visibleModal} onDismiss={hideModal}>
             {models.length > 0 ? (
               <FlatList
                 style={styles.modelList}
