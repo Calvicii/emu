@@ -225,6 +225,7 @@ export default function RootLayout() {
                     <TextInput
                       autoFocus={true}
                       style={styles.renameInput}
+                      contentStyle={styles.renameInputValue}
                       mode="outlined"
                       label="Rename"
                       onChangeText={(val) => setNewChatName(val)}
@@ -346,6 +347,9 @@ const styles = StyleSheet.create({
   },
   renameInput: {
     backgroundColor: theme.colors.header,
+  },
+  renameInputValue: {
+    fontFamily: "Outfit-Regular",
   },
   confirmButton: {
     flex: 1,

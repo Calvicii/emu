@@ -21,7 +21,7 @@ export default function Settings() {
   }, []);
 
   // Change the IP setting
-  function changeIp(ip) {
+  function changeIp(ip) { 
     setIp(ip);
     storeSetting("ip", ip);
   }
