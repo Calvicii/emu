@@ -317,6 +317,7 @@ const styles = StyleSheet.create({
   },
   modelListLabel: {
     fontFamily: "Outfit-Regular",
+    textAlign: "center",
   },
   chat: {
     flex: 1,

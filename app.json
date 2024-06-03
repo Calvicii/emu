@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "alpaca_mobile",
-    "slug": "alpaca_mobile",
+    "name": "Emu",
+    "slug": "Emu",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/emu.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/emu.png",
       "resizeMode": "contain",
       "backgroundColor": "#333"
     },
@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/emu.png",
         "backgroundColor": "#333"
       },
-      "package": "com.calvicii.alpaca_mobile"
+      "package": "com.calvicii.emu"
     },
     "web": {
       "bundler": "metro",
@@ -56,7 +56,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "af91d453-7cb6-4dcf-8cd4-ce7aa9393d23"
+        "projectId": "e349c6de-2f65-4c21-b4ac-beb220519572"
       }
     }
   }
