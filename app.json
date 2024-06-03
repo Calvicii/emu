@@ -46,6 +46,14 @@
             "./assets/fonts/Outfit-Thin.ttf"
           ]
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
     ],
     "experiments": {
