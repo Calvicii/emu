@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import { Drawer } from 'react-native-drawer-layout';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, FlatList, Vibration } from 'react-native';
 import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Divider, Menu, Portal, Modal, TextInput } from 'react-native-paper';
 import { Link, Stack, router } from 'expo-router';
@@ -99,7 +99,6 @@ export default function RootLayout() {
   const [visibleRename, setVisibleRename] = useState(false);
   function showRename(id) {
     setRenameChatId(id);
-    console.log(renameChatId);
     setVisibleMenuId(null);
     setVisibleRename(true);
   };
@@ -118,6 +117,7 @@ export default function RootLayout() {
   // For managing visible menu
   const [visibleMenuId, setVisibleMenuId] = useState(null);
   
+  // Extra fonts for the app
   const [fontsLoaded] = useFonts({
     'Outfit': require('../assets/fonts/Outfit-VariableFont.ttf'),
     'Outfit-Black': require('../assets/fonts/Outfit-Black.ttf'),
@@ -262,8 +262,8 @@ export default function RootLayout() {
                           </Button>
                         }
                       >
-                        <Menu.Item onPress={() => showRename(item.id)} title="Rename" leadingIcon="pencil" />
-                        <Menu.Item onPress={() => handleDeleteChat(item.id)} title="Delete" leadingIcon="delete" />
+                        <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title="Rename" leadingIcon="pencil" />
+                        <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title="Delete" leadingIcon="delete" />
                       </Menu>
                     </View>
                   )}
@@ -284,6 +284,7 @@ export default function RootLayout() {
                 <Modal visible={visibleRename} onDismiss={hideRename}>
                   <View style={styles.renameWindow}>
                     <TextInput
+                      autoFocus={true}
                       style={styles.renameInput}
                       mode="outlined"
                       label="Rename"
@@ -292,6 +293,7 @@ export default function RootLayout() {
                     <View style={{ flexDirection: "row", marginTop: 10 }}>
                       <Button
                         style={styles.confirmButton}
+                        labelStyle={styles.menuItemButton}
                         mode="contained-tonal"
                         onPress={() => {
                           handleRenameChat(renameChatId, newChatName);
@@ -303,6 +305,7 @@ export default function RootLayout() {
                       </Button>
                       <Button
                         style={styles.cancelButton}
+                        labelStyle={styles.menuItemButton}
                         mode="outlined"
                         onPress={hideRename}
                       >
@@ -412,5 +415,11 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     marginLeft: 5,
+  },
+  menuItemLabel: {
+    fontFamily: "Outfit-Regular",
+  },
+  menuItemButton: {
+    fontFamily: "Outfit-Regular",
   }
 });
