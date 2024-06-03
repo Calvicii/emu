@@ -2,8 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
 import { useLocalSearchParams } from "expo-router";
-import { getSetting } from './settings';
-import { getChats, storeChatMessages } from './_layout';
+import { getSetting, getChats, storeChatMessages } from './storage';
 
 export default function Index() {
 

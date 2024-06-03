@@ -1,11 +1,11 @@
 import 'react-native-gesture-handler';
 import { Drawer } from 'react-native-drawer-layout';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Vibration } from 'react-native';
 import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Divider, Menu, Portal, Modal, TextInput } from 'react-native-paper';
 import { Link, Stack, router } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { getChats, storeChats, deleteChat, renameChat, getChatName } from './storage';
 
 const theme = {
   ...MD3DarkTheme,
@@ -16,73 +16,6 @@ const theme = {
     header: '#444',
   },
 };
-
-export async function getChats() {
-  try {
-    const value = await AsyncStorage.getItem("chats");
-    return value !== null ? JSON.parse(value) : [];
-  } catch (error) {
-    console.error("Error:", error);
-    return [];
-  }
-}
-
-export async function storeChats(chats) {
-  try {
-    await AsyncStorage.setItem("chats", JSON.stringify(chats));
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
-export async function storeChatMessages(id, messages) {
-  try {
-    let chats = await getChats();
-    const chatIndex = chats.findIndex(chat => chat.id === parseInt(id));
-    if (chatIndex !== -1) {
-      chats[chatIndex].messages = messages;
-      await storeChats(chats);
-    } else {
-      console.error(`Chat with id ${id} not found.`);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
-export async function deleteChat(id) {
-  try {
-    const chats = await getChats();
-    const updatedChats = chats.filter(chat => chat.id !== id);
-    await storeChats(updatedChats);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
-export async function renameChat(id, name) {
-  try {
-    const chats = await getChats();
-    const chatIndex = chats.findIndex(chat => chat.id === parseInt(id));
-    if (chatIndex !== -1) {
-      chats[chatIndex].name = name;
-      await storeChats(chats)
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
-export async function getChatName(id) {
-  try {
-    const chats = await getChats();
-    const chatIndex = chats.findIndex(chat => chat.id === parseInt(id));
-    if (chatIndex !== -1)
-      return chats[chatIndex].name;
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
 
 export default function RootLayout() {
 
@@ -131,6 +64,7 @@ export default function RootLayout() {
     'Outfit-Thin': require('../assets/fonts/Outfit-Thin.ttf'),
   });
 
+  // Retrieve the chats
   useEffect(() => {
     async function loadChats() {
       const storedChats = await getChats();
@@ -148,6 +82,7 @@ export default function RootLayout() {
     );
   }
 
+  // Create a new chat
   async function newChat() {
     let chats = await getChats();
     let newChatId;
@@ -161,6 +96,7 @@ export default function RootLayout() {
     return newChatId;
   }
 
+  // Delete a chat
   async function handleDeleteChat(id) {
     await deleteChat(id);
     const updatedChats = await getChats();
@@ -175,6 +111,7 @@ export default function RootLayout() {
       });
   }
 
+  // Rename a chat
   async function handleRenameChat(id, name) {
     await renameChat(id, name);
     const updatedChats = await getChats();
@@ -184,11 +121,13 @@ export default function RootLayout() {
     hideRename();
   }
 
+  // Long presses on buttons
   const handleLongPress = (id) => {
     Vibration.vibrate(1);
     setVisibleMenuId(id);
   };
 
+  // Close the context menu
   const handleCloseMenu = () => setVisibleMenuId(null);
 
   return (

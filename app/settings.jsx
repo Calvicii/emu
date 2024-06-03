@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme, TextInput } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export async function getSetting(key) {
-  try {
-    const value = await AsyncStorage.getItem(key);
-    return value !== null ? value : "";
-  } catch (error) {
-    console.error("Error:", error);
-    return "";
-  }
-}
-
-export async function storeSetting(key, value) {
-  try {
-    await AsyncStorage.setItem(key, value);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
+import { getSetting, storeSetting } from './storage';
 
 export default function Settings() {
 
@@ -38,6 +20,7 @@ export default function Settings() {
     fetchSettings();
   }, []);
 
+  // Change the IP setting
   function changeIp(ip) {
     setIp(ip);
     storeSetting("ip", ip);
