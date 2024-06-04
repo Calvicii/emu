@@ -6,9 +6,6 @@ Emu is an [Ollama](https://github.com/ollama/ollama) client where you can manage
 
 ---
 
-> [!WARNING]
-> This project is not affiliated at all with Ollama, I'm not responsible for any damages to your device or software caused by running code given by any AI models.
-
 # Features!
 - Talk to multiple models in the same conversation
 - Multiple conversations
