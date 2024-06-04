@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Vibration } from 'react-native';
 import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
 import { useLocalSearchParams } from "expo-router";
 import { getSetting, getChats, storeChatMessages } from './storage';
@@ -140,6 +140,9 @@ export default function Index() {
   
         // Store the updated chat state
         storeChatMessages(chatId, [...chat, userMessage, data.message]);
+
+        // Give haptic feedback
+        Vibration.vibrate(1);
   
         // Clear any error message
         setErrorMessage("");
