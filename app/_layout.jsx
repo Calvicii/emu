@@ -155,6 +155,7 @@ export default function RootLayout() {
                     const newChatId = await newChat();
                     setOpen(false);
                     setCurrentChatName("New Chat");
+                    setCurrentChatId(newChatId);
                     router.navigate({
                       pathname: "",
                       params: {
