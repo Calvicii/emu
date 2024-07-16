@@ -101,7 +101,7 @@ export default function RootLayout() {
     await deleteChat(id);
     const updatedChats = await getChats();
     setChats(updatedChats);
-    if (currentChatId === id)
+    if (currentChatId === id) {
       setCurrentChatName("");
       router.navigate({
         pathname: "",
@@ -109,6 +109,7 @@ export default function RootLayout() {
           chatId: undefined,
         }
       });
+    }
   }
 
   // Rename a chat
@@ -167,7 +168,7 @@ export default function RootLayout() {
                 <Divider style={styles.divider} />
                 <FlatList
                   style={styles.chatList}
-                  data={chats}
+                  data={[...chats].reverse()}
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
                     <View style={styles.chatItem}>

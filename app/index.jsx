@@ -58,7 +58,7 @@ export default function Index() {
           const messages = chats[chatIndex].messages;
           setChat(messages);
         }
-      }      
+      }
       retrieveChat();
 
       // Refresh the list of models
