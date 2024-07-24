@@ -16,7 +16,7 @@ export default function Index() {
   const [ip, setIp] = useState("");
 
   // For the modal's functions
-  const [visibleModal, setVisibleModal] = React.useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
 
@@ -94,6 +94,11 @@ export default function Index() {
     }
   }
 
+  function generateTimeStamp() {
+    let currentDate = new Date();
+    return `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')} ${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}:${currentDate.getSeconds().toString().padStart(2, '0')}`;
+  }
+
   async function sendPrompt() {
     if (prompt !== "" && selectedModel !== "") {
       try {
@@ -110,6 +115,7 @@ export default function Index() {
         const userMessage = {
           role: "user",
           content: prompt,
+          time: generateTimeStamp(),
         };
         
         setChat([...chat, userMessage])
@@ -134,12 +140,19 @@ export default function Index() {
   
         // Receive the data from the response
         const data = await response.json();
-  
+
+        // Create the user's message object
+        const assistantMessage = {
+          role: "assistant",
+          content: data.message.content,
+          time: generateTimeStamp(),
+        };
+
         // Update the chat state with the response and user's message
-        setChat(prevChat => [...prevChat, data.message]);
+        setChat(prevChat => [...prevChat, assistantMessage]);
   
         // Store the updated chat state
-        storeChatMessages(chatId, [...chat, userMessage, data.message]);
+        storeChatMessages(chatId, [...chat, userMessage, assistantMessage]);
 
         // Give haptic feedback
         Vibration.vibrate(1);
@@ -232,6 +245,7 @@ export default function Index() {
                     return (
                       <Surface style={styles.modelBubble} mode="flat">
                         <Text style={styles.bubbleLabel}>{item.content}</Text>
+                        <Text style={styles.bubbleTimeStamp}>{item.time}</Text>
                       </Surface>
                     );
                   }
@@ -239,6 +253,7 @@ export default function Index() {
                     return (
                       <Surface style={styles.userBubble} mode="elevated">
                         <Text style={styles.bubbleLabel}>{item.content}</Text>
+                        <Text style={styles.bubbleTimeStamp}>{item.time}</Text>
                       </Surface>
                     );
                   }
@@ -340,6 +355,12 @@ const styles = StyleSheet.create({
   },
   bubbleLabel: {
     fontFamily: "Outfit-Regular",
+  },
+  bubbleTimeStamp: {
+    marginTop: 10,
+    fontFamily: "Outfit-Regular",
+    fontSize: 10,
+    color: "grey",
   },
   errorMessage: {
     flex: 0,
