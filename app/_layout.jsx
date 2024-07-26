@@ -2,10 +2,11 @@ import 'react-native-gesture-handler';
 import { Drawer } from 'react-native-drawer-layout';
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Vibration } from 'react-native';
-import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Divider, Menu, Portal, Modal, TextInput } from 'react-native-paper';
+import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Divider, Menu, Portal, Modal, TextInput, Text } from 'react-native-paper';
 import { Link, Stack, router } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { getChats, storeChats, deleteChat, renameChat, getChatName } from './storage';
+import { generateDate, getChatDate } from './utils';
 
 const theme = {
   ...MD3DarkTheme,
@@ -46,6 +47,7 @@ export default function RootLayout() {
 
   // All stored chats
   const [chats, setChats] = useState([]);
+  const [sortedChats, setSortedChats] = useState([,]);
 
   // For managing visible menu
   const [visibleMenuId, setVisibleMenuId] = useState(null);
@@ -64,7 +66,7 @@ export default function RootLayout() {
     'Outfit-Thin': require('../assets/fonts/Outfit-Thin.ttf'),
   });
 
-  // Retrieve the chats
+  // Retrieve the chats and sort them
   useEffect(() => {
     async function loadChats() {
       const storedChats = await getChats();
@@ -72,6 +74,11 @@ export default function RootLayout() {
     }
     loadChats();
   }, []);
+
+  // Sort the chats
+  useEffect(() => {
+    setSortedChats(sortChats(chats));
+  }, [chats]);
 
   // Show a loading screen if the fonts have not loaded yet
   if (!fontsLoaded) {
@@ -90,7 +97,7 @@ export default function RootLayout() {
       newChatId = 0;
     else
       newChatId = chats[chats.length - 1].id + 1;
-    chats.push({ id: newChatId, name: "New Chat", messages: [] });
+    chats.push({ id: newChatId, name: "New Chat", date: generateDate(), messages: [] }); //TODO
     await storeChats(chats);
     setChats(chats);
     return newChatId;
@@ -120,6 +127,46 @@ export default function RootLayout() {
     if (currentChatId === id)
       setCurrentChatName(name);
     hideRename();
+  }
+
+  // Create the timeline labels in the chat list
+  function generateTimelineLabel(chat) {
+    if (chat.length > 0) {
+      let today = new Date();
+      let comparedDate = getChatDate(chat[0]);
+
+      if (today.getDate() === comparedDate.getDate() && today.getMonth() + 1 === comparedDate.getMonth() && today.getFullYear() == comparedDate.getFullYear()) {
+        return "Today";
+      } else if (today.getDate() === comparedDate.getDate() + 1 && today.getMonth() + 1 === comparedDate.getMonth() && today.getFullYear() == comparedDate.getFullYear()) {
+        return "Yesterday";
+      } else {
+        return "Once upon a time...";
+      }
+    } else {
+      return "";
+    }
+  }
+
+  // Sort the chats into lists depending on the last time they were modified
+  function sortChats(chats) {
+    let todayChats = [];
+    let yesterdayChats = [];
+    let pastChats = [];
+
+    for (let chat of chats) {
+      let today = new Date();
+      let comparedDate = getChatDate(chat);
+
+      if (today.getDate() === comparedDate.getDate() && today.getMonth() + 1 === comparedDate.getMonth() && today.getFullYear() == comparedDate.getFullYear()) {
+        todayChats.push(chat);
+      } else if (today.getDate() === comparedDate.getDate() + 1 && today.getMonth() + 1 === comparedDate.getMonth() && today.getFullYear() == comparedDate.getFullYear()) {
+        yesterdayChats.push(chat);
+      } else {
+        pastChats.push(chat);
+      }
+    }
+
+    return [todayChats, yesterdayChats, pastChats];
   }
 
   // Long presses on buttons
@@ -167,46 +214,58 @@ export default function RootLayout() {
                   New Chat
                 </Button>
                 <Divider style={styles.divider} />
+
                 <FlatList
                   style={styles.chatList}
-                  data={[...chats].reverse()}
-                  keyExtractor={(item) => item.id.toString()}
+                  data={[...sortedChats]}
                   renderItem={({ item }) => (
-                    <View style={styles.chatItem}>
-                      <Menu
-                      contentStyle={styles.menu}
-                        visible={visibleMenuId === item.id}
-                        onDismiss={handleCloseMenu}
-                        anchor={
-                          <Button
-                            labelStyle={{ fontFamily: "Outfit-Regular" }}
-                            mode="outlined"
-                            textColor={theme.colors.primary}
-                            onLongPress={() => handleLongPress(item.id)}
-                            onPress={() => {
-                              setOpen(false);
-                              setCurrentChatId(item.id);
-                              async function setCurrentName() {
-                                let name = await getChatName(item.id);
-                                setCurrentChatName(name);
+                    <>
+                      <Text style={styles.chatTimeStamp}>{generateTimelineLabel(item)}</Text>
+                      <FlatList
+                        style={styles.chatList}
+                        data={[...item].reverse()}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                          <View style={styles.chatItem}>
+                            <Menu
+                            contentStyle={styles.menu}
+                              visible={visibleMenuId === item.id}
+                              onDismiss={handleCloseMenu}
+                              anchor={
+                                <>
+                                  <Button
+                                    labelStyle={{ fontFamily: "Outfit-Regular" }}
+                                    mode="outlined"
+                                    textColor={theme.colors.primary}
+                                    onLongPress={() => handleLongPress(item.id)}
+                                    onPress={() => {
+                                      setOpen(false);
+                                      setCurrentChatId(item.id);
+                                      async function setCurrentName() {
+                                        let name = await getChatName(item.id);
+                                        setCurrentChatName(name);
+                                      }
+                                      setCurrentName();
+                                      router.navigate({
+                                        pathname: "",
+                                        params: {
+                                          chatId: item.id,
+                                        }
+                                      });
+                                    }}
+                                  >
+                                    {item.name}
+                                  </Button>
+                                </>
                               }
-                              setCurrentName();
-                              router.navigate({
-                                pathname: "",
-                                params: {
-                                  chatId: item.id,
-                                }
-                              });
-                            }}
-                          >
-                            {item.name}
-                          </Button>
-                        }
-                      >
-                        <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title="Rename" leadingIcon="pencil" />
-                        <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title="Delete" leadingIcon="delete" />
-                      </Menu>
-                    </View>
+                            >
+                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title="Rename" leadingIcon="pencil" />
+                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title="Delete" leadingIcon="delete" />
+                            </Menu>
+                          </View>
+                        )}
+                      />
+                    </>
                   )}
                 />
               </View>
@@ -324,6 +383,10 @@ const styles = StyleSheet.create({
   },
   chatItem: {
     marginBottom: 5,
+  },
+  chatTimeStamp: {
+    fontFamily: "Outfit-Bold",
+    fontSize: 20,
   },
   navSettings: {
     flex: 0,
