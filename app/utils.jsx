@@ -19,3 +19,22 @@ export function getChatDate(chat) {
     let seconds = timeOnly.split(":")[2];
     return new Date(year, month, day, hour, minutes, seconds);
 }
+
+export function sortChatsFromDates(chats) {
+    if (chats.length <= 1) return chats;
+
+    let pivot = getChatDate(chats[0]);
+    let left = [];
+    let right = [];
+
+    for (let i = 1; i < chats.length; i++) {
+        let date = getChatDate(chats[i]);
+        if (date < pivot) {
+            left.push(chats[i]);
+        } else {
+            right.push(chats[i]);
+        }
+    }
+
+    return [...sortChatsFromDates(left), chats[0], ...sortChatsFromDates(right)];
+}

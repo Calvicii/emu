@@ -6,7 +6,7 @@ import { MD3DarkTheme, PaperProvider, ActivityIndicator, IconButton, Button, Div
 import { Link, Stack, router } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { getChats, storeChats, deleteChat, renameChat, getChatName } from './storage';
-import { generateDate, getChatDate } from './utils';
+import { generateDate, getChatDate, sortChatsFromDates } from './utils';
 
 const theme = {
   ...MD3DarkTheme,
@@ -47,7 +47,7 @@ export default function RootLayout() {
 
   // All stored chats
   const [chats, setChats] = useState([]);
-  const [sortedChats, setSortedChats] = useState([,]);
+  const [sortedChats, setSortedChats] = useState([[], [], []]);
 
   // For managing visible menu
   const [visibleMenuId, setVisibleMenuId] = useState(null);
@@ -73,12 +73,14 @@ export default function RootLayout() {
       setChats(storedChats);
     }
     loadChats();
-  }, []);
+  }, [open]);
 
   // Sort the chats
   useEffect(() => {
-    setSortedChats(sortChats(chats));
-  }, [chats]);
+    console.log(sortedChats);
+    setSortedChats(sortChats([...chats]));
+    console.log(sortedChats);
+  }, [chats, open]);
 
   // Show a loading screen if the fonts have not loaded yet
   if (!fontsLoaded) {
@@ -166,6 +168,15 @@ export default function RootLayout() {
       }
     }
 
+    if (todayChats.length > 0)
+      todayChats = sortChatsFromDates(todayChats);
+
+    if (yesterdayChats.length > 0)
+      yesterdayChats = sortChatsFromDates(yesterdayChats);
+
+    if (pastChats.length > 0)
+      pastChats = sortChatsFromDates(pastChats);
+
     return [todayChats, yesterdayChats, pastChats];
   }
 
@@ -217,7 +228,7 @@ export default function RootLayout() {
 
                 <FlatList
                   style={styles.chatList}
-                  data={[...sortedChats]}
+                  data={sortedChats}
                   renderItem={({ item }) => (
                     <>
                       <Text style={styles.chatTimeStamp}>{generateTimelineLabel(item)}</Text>
