@@ -50,7 +50,6 @@ export default function Index() {
     console.log("refresh");
   
     if (chatId !== undefined) {
-
       // Retrieve the chat
       async function retrieveChat() {
         const chats = await getChats();
@@ -114,7 +113,7 @@ export default function Index() {
           date: generateDate(),
         };
         
-        setChat([...chat, userMessage])
+        setChat([...chat, userMessage]);
 
         // Send the request to the server
         const response = await fetch(`http://${ip}/api/chat`, {
@@ -177,59 +176,18 @@ export default function Index() {
   } else {
     return (
       <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
-        <Portal>
-          <Modal visible={visibleModal} onDismiss={hideModal}>
-            {models.length > 0 ? (
-              <FlatList
-                style={styles.modelList}
-                data={models}
-                keyExtractor={(item) => item.name}
-                renderItem={({ item }) => (
-                  <Button
-                    labelStyle={styles.modelListLabel}
-                    onPress={() => {
-                      setSelectedModel(item.name);
-                      hideModal();
-                    }}
-                  >
-                    {item.name}
-                  </Button>
-                )}
-              />
-              ) : (
-                <View style={styles.modelList}>
-                  <Text style={styles.modelListLabel}>No models available</Text>
-                </View>
-              )
-            }
-          </Modal>
-        </Portal>
+
+        <ModelList models={models} visibility={visibleModal} onDismiss={hideModal} onPress={setSelectedModel} />
   
         <View style={styles.window}>
   
           <View style={styles.options}>
-  
-          {selectedModel === "" ? (
-                <Button style={styles.selectedMode} onPress={showModal} labelStyle={styles.selectedModeLabel}>
-                  Select a model
-                </Button>
-            ) : (
-              <Button style={styles.selectedMode} onPress={showModal} labelStyle={styles.selectedModeLabel}>
-                {selectedModel}
-              </Button>
-            )
-          }
-  
+            <ModelSelector selectedModel={selectedModel} onPress={showModal} />
           </View>
   
           <View style={styles.chat}>
   
-            {errorMessage !== "" ? (
-                <Text style={styles.errorMessage}>{errorMessage}</Text>
-              ) : (
-                <></>
-              )
-            }
+            <ErrorMessage error={errorMessage} />
   
             <FlatList
               inverted
@@ -237,22 +195,7 @@ export default function Index() {
               data={[...chat].reverse()}
               renderItem={({ item }) => {
                 if (item !== undefined) {
-                  if (item.role === "assistant") {
-                    return (
-                      <Surface style={styles.modelBubble} mode="flat">
-                        <Text style={styles.bubbleLabel}>{item.content}</Text>
-                        <Text style={styles.bubbleTimeStamp}>{item.date}</Text>
-                      </Surface>
-                    );
-                  }
-                  if (item.role === "user") {
-                    return (
-                      <Surface style={styles.userBubble} mode="elevated">
-                        <Text style={styles.bubbleLabel}>{item.content}</Text>
-                        <Text style={styles.bubbleTimeStamp}>{item.date}</Text>
-                      </Surface>
-                    );
-                  }
+                  return <ChatBubble content={item.content} date={item.date} role={item.role} />;
                 }
               }}
             />
@@ -286,6 +229,78 @@ export default function Index() {
   }
 }
 
+// Bubble containing a chat message
+function ChatBubble({ content, date, role }) {
+  let mode = "flat";
+  let style = styles.modelBubble;
+  if (role === "user") {
+    mode = "elevated";
+    style = styles.userBubble;
+  }
+
+  return (
+    <Surface style={style} mode={mode}>
+      <Text style={styles.bubbleLabel}>{content}</Text>
+      <Text style={styles.bubbleTimeStamp}>{date}</Text>
+    </Surface>
+  );
+}
+
+// Button to open the list of models
+function ModelSelector({ selectedModel, onPress }) {
+  if (selectedModel === "")
+    selectedModel = "Select a model";
+  return (
+    <Button style={styles.selectedModel} onPress={onPress} labelStyle={styles.selectedModelLabel}>
+      {selectedModel}
+    </Button>
+  );
+}
+
+// List of models the user can choose from
+function ModelList({ models, visibility, onDismiss, onPress }) {
+  if (models.length <= 0) {
+    return (
+      <Portal>
+        <Modal visible={visibility} onDismiss={onDismiss}>
+          <View style={styles.modelList}>
+            <Text style={styles.modelListLabel}>No models available</Text>
+          </View>
+        </Modal>
+      </Portal>
+    );
+  }
+
+  return (
+    <Portal>
+      <Modal visible={visibility} onDismiss={onDismiss}>
+        <FlatList
+          style={styles.modelList}
+          data={models}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <Button
+              labelStyle={styles.modelListLabel}
+              onPress={() => {
+                onPress(item.name);
+                onDismiss();
+              }}
+            >
+              {item.name}
+            </Button>
+          )}
+        />
+      </Modal>
+    </Portal>
+  );
+}
+
+function ErrorMessage({ error }) {
+  if (error !== "")
+    return <Text style={styles.errorMessage}>{error}</Text>;
+  return <></>;
+}
+
 const styles = StyleSheet.create({
   window: {
     flex: 1,
@@ -313,11 +328,11 @@ const styles = StyleSheet.create({
   sendButton: {
     marginLeft: 15,
   },
-  selectedMode: {
+  selectedModel: {
     margin: "auto",
     width: "50%",
   },
-  selectedModeLabel: {
+  selectedModelLabel: {
     fontFamily: "Outfit-Medium",
     fontSize: 20,
   },

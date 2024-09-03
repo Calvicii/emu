@@ -77,9 +77,7 @@ export default function RootLayout() {
 
   // Sort the chats
   useEffect(() => {
-    console.log(sortedChats);
     setSortedChats(sortChats([...chats]));
-    console.log(sortedChats);
   }, [chats, open]);
 
   // Show a loading screen if the fonts have not loaded yet
