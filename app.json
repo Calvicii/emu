@@ -2,13 +2,13 @@
   "expo": {
     "name": "Emu",
     "slug": "Emu",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
-    "icon": "./assets/images/emu.png",
+    "icon": "./assets/images/emu-bg.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/emu.png",
+      "image": "./assets/images/emu-bg.png",
       "resizeMode": "contain",
       "backgroundColor": "#333"
     },
@@ -18,15 +18,15 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/emu.png",
+        "foregroundImage": "./assets/images/emu-bg.png",
         "backgroundColor": "#333"
       },
-      "package": "com.calvicii.emu"
+      "package": "com.github.calvicii.emu"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/emu.png"
+      "favicon": "./assets/images/emu-bg.png"
     },
     "plugins": [
       "expo-router",
