@@ -2,14 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="2000"
-   height="2000"
-   viewBox="0 0 529.16665 529.16666"
+   width="2500"
+   height="2500"
+   viewBox="0 0 661.45831 661.45833"
    version="1.1"
    id="svg1"
    inkscape:version="1.3.2 (091e20ef0f, 2023-11-25)"
    sodipodi:docname="emu.svg"
-   inkscape:export-filename="../emu-bg.png"
+   inkscape:export-filename="../emu.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -27,16 +27,16 @@
      inkscape:deskcolor="#191919"
      inkscape:document-units="mm"
      showborder="false"
-     inkscape:zoom="0.25589752"
-     inkscape:cx="824.54884"
-     inkscape:cy="740.53083"
+     inkscape:zoom="0.36189374"
+     inkscape:cx="1099.7703"
+     inkscape:cy="849.69692"
      inkscape:window-width="2560"
      inkscape:window-height="1355"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
-     inkscape:export-bgcolor="#212121ff" />
+     inkscape:export-bgcolor="#21212100" />
   <defs
      id="defs1" />
   <g
@@ -48,8 +48,8 @@
        id="rect3"
        width="158.40471"
        height="51.862644"
-       x="225.35355"
-       y="231.57542"
+       x="292.5806"
+       y="296.74191"
        rx="44.091026"
        ry="14.979445"
        transform="matrix(0.99989196,0.0146994,-0.01648022,0.99986419,0,0)" />
@@ -58,8 +58,8 @@
        id="rect3-6"
        width="237.5928"
        height="51.871449"
-       x="138.66069"
-       y="-208.1581"
+       x="203.15862"
+       y="-274.95642"
        rx="66.132561"
        ry="14.981987"
        transform="matrix(-0.00980019,0.99995198,-0.99969451,-0.02471613,0,0)" />
@@ -68,8 +68,8 @@
        id="rect3-7"
        width="158.40471"
        height="51.862644"
-       x="223.89626"
-       y="143.15836"
+       x="291.12332"
+       y="208.32483"
        rx="44.091022"
        ry="14.979445"
        transform="matrix(0.99989196,0.0146994,-0.01648022,0.99986419,0,0)" />
@@ -78,14 +78,14 @@
        id="rect3-7-6"
        width="158.40471"
        height="51.862644"
-       x="226.81084"
-       y="319.99249"
+       x="294.0379"
+       y="385.15897"
        rx="44.091026"
        ry="14.979445"
        transform="matrix(0.99989196,0.0146994,-0.01648022,0.99986419,0,0)" />
     <path
        id="path3"
        style="fill:#ffffff;stroke-width:0.311781"
-       d="M 264.58333 66.145833 A 198.4375 198.4375 0 0 0 66.145833 264.58333 A 198.4375 198.4375 0 0 0 264.58333 463.02083 A 198.4375 198.4375 0 0 0 463.02083 264.58333 A 198.4375 198.4375 0 0 0 264.58333 66.145833 z M 264.58333 79.375 A 185.20833 185.20833 0 0 1 449.79167 264.58333 A 185.20833 185.20833 0 0 1 264.58333 449.79167 A 185.20833 185.20833 0 0 1 79.375 264.58333 A 185.20833 185.20833 0 0 1 264.58333 79.375 z " />
+       d="m 330.72917,132.29167 a 198.4375,198.4375 0 0 0 -198.4375,198.4375 198.4375,198.4375 0 0 0 198.4375,198.4375 198.4375,198.4375 0 0 0 198.4375,-198.4375 198.4375,198.4375 0 0 0 -198.4375,-198.4375 z m 0,13.22917 A 185.20833,185.20833 0 0 1 515.93751,330.72917 185.20833,185.20833 0 0 1 330.72917,515.93751 185.20833,185.20833 0 0 1 145.52084,330.72917 185.20833,185.20833 0 0 1 330.72917,145.52084 Z" />
   </g>
 </svg>
