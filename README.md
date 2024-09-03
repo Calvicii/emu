@@ -18,8 +18,3 @@ Emu is an [Ollama](https://github.com/ollama/ollama) client where you can manage
 1. Go to the `releases` page
 2. Download the latest apk file
 3. Run it on your Android device
-
----
-
-## Thanks
-- [Jeffser](https://github.com/Jeffser) for their app, [Alpaca](https://github.com/Jeffser/Alpaca), that inspired this project.
