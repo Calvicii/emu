@@ -180,15 +180,12 @@ export default function Index() {
         <ModelList models={models} visibility={visibleModal} onDismiss={hideModal} onPress={setSelectedModel} />
   
         <View style={styles.window}>
-  
           <View style={styles.options}>
             <ModelSelector selectedModel={selectedModel} onPress={showModal} />
           </View>
   
           <View style={styles.chat}>
-  
             <ErrorMessage error={errorMessage} />
-  
             <FlatList
               inverted
               ref={chatListRef}
@@ -200,7 +197,6 @@ export default function Index() {
               }}
             />
           </View>
-  
         </View>
   
         <View style={styles.controls}>
@@ -240,10 +236,29 @@ function ChatBubble({ content, date, role }) {
 
   return (
     <Surface style={style} mode={mode}>
-      <Text style={styles.bubbleLabel}>{content}</Text>
+      <Text style={styles.bubbleLabel} selectable>{FormatMessage(content)}</Text>
       <Text style={styles.bubbleTimeStamp}>{date}</Text>
     </Surface>
   );
+}
+
+function FormatMessage(message) {
+  return FormatTitle(message);
+}
+
+function FormatTitle(message) {
+  const splitMessage = message.split("**");
+
+  return splitMessage.map((part, index) => {
+    let style = styles.bubbleLabel;
+    if (index % 2 !== 0)
+      style = styles.bubbleLabelBold;
+    return (
+      <Text key={index} style={style}>
+        {part}
+      </Text>
+    );
+  });
 }
 
 // Button to open the list of models
@@ -366,6 +381,9 @@ const styles = StyleSheet.create({
   },
   bubbleLabel: {
     fontFamily: "Outfit-Regular",
+  },
+  bubbleLabelBold: {
+    fontFamily: "Outfit-Bold",
   },
   bubbleTimeStamp: {
     marginTop: 10,
