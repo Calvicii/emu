@@ -243,23 +243,52 @@ function ChatBubble({ content, date, role }) {
 }
 
 function FormatMessage(message) {
-  return FormatTitle(message);
-}
-
-function FormatTitle(message) {
-  const splitMessage = message.split("**");
-
-  return splitMessage.map((part, index) => {
-    let style = styles.bubbleLabel;
-    if (index % 2 !== 0)
-      style = styles.bubbleLabelBold;
-    return (
-      <Text key={index} style={style}>
-        {part}
-      </Text>
-    );
+  const parts = message.split("```");
+  
+  return parts.map((part, index) => {
+    if (index % 2 === 0) {
+      const splitText = part.split("**");
+      
+      return splitText.map((text, textIndex) => {
+        let style = styles.bubbleLabel;
+        if (textIndex % 2 !== 0) {
+          style = styles.bubbleLabelBold;
+        }
+        return (
+          <Text key={`${index}-${textIndex}`} style={style}>
+            {text}
+          </Text>
+        );
+      });
+    } else {
+      const languageNameSplit = part.split('\n')[0];
+      if (languageNameSplit !== "") {
+        return (
+          <View style={styles.namedCodeBlock}>
+            <Surface style={styles.bubbleLabelCodeTitle}>
+              <Text style={styles.bubbleLabelBold}>
+                {languageNameSplit}
+              </Text>
+            </Surface>
+            <Surface key={index} style={styles.bubbleLabelCode}>
+              <Text style={styles.bubbleLabelCode} selectable>
+                {part.split(languageNameSplit)[1].trim()}
+              </Text>
+            </Surface>
+          </View>
+        );
+      }
+      return (
+        <Surface key={index} style={styles.bubbleLabelLonelyCode}>
+          <Text style={styles.bubbleLabelCode} selectable>
+            {part.trim()}
+          </Text>
+        </Surface>
+      );
+    }
   });
 }
+
 
 // Button to open the list of models
 function ModelSelector({ selectedModel, onPress }) {
@@ -384,6 +413,35 @@ const styles = StyleSheet.create({
   },
   bubbleLabelBold: {
     fontFamily: "Outfit-Bold",
+  },
+  bubbleLabelLonelyCode: {
+    fontFamily: "RobotoMono-Regular",
+    fontSize: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: "#222"
+  },
+  bubbleLabelCode: {
+    fontFamily: "RobotoMono-Regular",
+    fontSize: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
+    backgroundColor: "#222"
+  },
+  bubbleLabelCodeTitle: {
+    fontFamily: "RobotoMono-Regular",
+    fontSize: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+    backgroundColor: "#444"
+  },
+  namedCodeBlock: {
+    flexDirection: 'column',
   },
   bubbleTimeStamp: {
     marginTop: 10,

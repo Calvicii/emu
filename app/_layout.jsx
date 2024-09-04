@@ -64,6 +64,20 @@ export default function RootLayout() {
     'Outfit-Regular': require('../assets/fonts/Outfit-Regular.ttf'),
     'Outfit-SemiBold': require('../assets/fonts/Outfit-SemiBold.ttf'),
     'Outfit-Thin': require('../assets/fonts/Outfit-Thin.ttf'),
+    'RobotoMono-Bold': require('../assets/fonts/RobotoMono-Bold.ttf'),
+    'RobotoMono-BoldItalic': require('../assets/fonts/RobotoMono-BoldItalic.ttf'),
+    'RobotoMono-ExtraLight': require('../assets/fonts/RobotoMono-Bold.ttf'),
+    'RobotoMono-ExtraLightItalic': require('../assets/fonts/RobotoMono-BoldItalic.ttf'),
+    'RobotoMono-Italic': require('../assets/fonts/RobotoMono-Italic.ttf'),
+    'RobotoMono-Light': require('../assets/fonts/RobotoMono-Light.ttf'),
+    'RobotoMono-LightItalic': require('../assets/fonts/RobotoMono-LightItalic.ttf'),
+    'RobotoMono-Medium': require('../assets/fonts/RobotoMono-Medium.ttf'),
+    'RobotoMono-MediumItalic': require('../assets/fonts/RobotoMono-MediumItalic.ttf'),
+    'RobotoMono-Regular': require('../assets/fonts/RobotoMono-Regular.ttf'),
+    'RobotoMono-SemiBold': require('../assets/fonts/RobotoMono-SemiBold.ttf'),
+    'RobotoMono-SemiBoldItalic': require('../assets/fonts/RobotoMono-SemiBoldItalic.ttf'),
+    'RobotoMono-Thin': require('../assets/fonts/RobotoMono-Thin.ttf'),
+    'RobotoMono-ThinItalic': require('../assets/fonts/RobotoMono-ThinItalic.ttf'),
   });
 
   // Retrieve the chats and sort them
