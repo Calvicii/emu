@@ -255,7 +255,7 @@ function FormatMessage(message) {
           style = styles.bubbleLabelBold;
         }
         return (
-          <Text key={`${index}-${textIndex}`} style={style}>
+          <Text style={style}>
             {text}
           </Text>
         );
@@ -270,8 +270,8 @@ function FormatMessage(message) {
                 {languageNameSplit}
               </Text>
             </Surface>
-            <Surface key={index} style={styles.bubbleLabelCode}>
-              <Text style={styles.bubbleLabelCode} selectable>
+            <Surface style={styles.bubbleLabelCode}>
+              <Text style={styles.bubbleLabelCode}>
                 {part.split(languageNameSplit)[1].trim()}
               </Text>
             </Surface>
@@ -279,8 +279,8 @@ function FormatMessage(message) {
         );
       }
       return (
-        <Surface key={index} style={styles.bubbleLabelLonelyCode}>
-          <Text style={styles.bubbleLabelCode} selectable>
+        <Surface style={styles.bubbleLabelLonelyCode}>
+          <Text style={styles.bubbleLabelCode}>
             {part.trim()}
           </Text>
         </Surface>
