@@ -146,6 +146,7 @@ export default function Index() {
           role: "assistant",
           content: data.message.content,
           date: generateDate(),
+          model: selectedModel,
         };
 
         // Update the chat state with the response and user's message
@@ -236,7 +237,7 @@ export default function Index() {
               data={[...chat].reverse()}
               renderItem={({ item }) => {
                 if (item !== undefined) {
-                  return <ChatBubble content={item.content} date={item.date} role={item.role} />;
+                  return <ChatBubble content={item.content} date={item.date} role={item.role} model={item.model} />;
                 }
               }}
             />
@@ -270,7 +271,7 @@ export default function Index() {
 }
 
 // Bubble containing a chat message
-function ChatBubble({ content, date, role }) {
+function ChatBubble({ content, date, role, model }) {
   let mode = "flat";
   let style = styles.modelBubble;
   if (role === "user") {
@@ -278,10 +279,17 @@ function ChatBubble({ content, date, role }) {
     style = styles.userBubble;
   }
 
+  let modelName = "";
+
+  if (model !== undefined) {
+    modelName = <Text style={styles.bubbleModel}>{model}</Text>;
+  }
+
   return (
     <Surface style={style} mode={mode}>
       <Text style={styles.bubbleLabel} selectable>{FormatMessage(content)}</Text>
       <Text style={styles.bubbleTimeStamp}>{date}</Text>
+      {modelName}
     </Surface>
   );
 }
@@ -489,6 +497,11 @@ const styles = StyleSheet.create({
   },
   bubbleTimeStamp: {
     marginTop: 10,
+    fontFamily: "Outfit-Regular",
+    fontSize: 10,
+    color: "grey",
+  },
+  bubbleModel: {
     fontFamily: "Outfit-Regular",
     fontSize: 10,
     color: "grey",
