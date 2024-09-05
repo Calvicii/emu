@@ -9,6 +9,7 @@ Emu is an [Ollama](https://github.com/ollama/ollama) client where you can manage
 # Features!
 - Talk to multiple models in the same conversation
 - Multiple conversations
+- Automatically name your chats
 
 ## Screenshots
 <p align="center"><img height="500" src="https://github.com/Calvicii/Emu/blob/master/assets/images/Screenshot_0.png"></p>

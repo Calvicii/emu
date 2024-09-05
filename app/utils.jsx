@@ -38,3 +38,7 @@ export function sortChatsFromDates(chats) {
 
     return [...sortChatsFromDates(left), chats[0], ...sortChatsFromDates(right)];
 }
+
+export function stringToBool(str) {
+    return str.toLowerCase() === 'true';
+}

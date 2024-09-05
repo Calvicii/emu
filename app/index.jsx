@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, FlatList, Vibration } from 'react-native';
 import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
 import { useLocalSearchParams } from "expo-router";
-import { getSetting, getChats, storeChatMessages } from './storage';
-import { generateDate } from './utils';
+import { getSetting, getChats, storeChatMessages, renameChat } from './storage';
+import { generateDate, stringToBool } from './utils';
 
 export default function Index() {
 
@@ -15,6 +15,9 @@ export default function Index() {
 
   // Ollama server's IP
   const [ip, setIp] = useState("");
+
+  // For auto renaming of chats
+  const [autoRenameState, setAutoRenameState] = useState(false);
 
   // For the modal's functions
   const [visibleModal, setVisibleModal] = useState(false);
@@ -48,7 +51,7 @@ export default function Index() {
   // Refresh the model list and grab the chat from storage
   useEffect(() => {
     console.log("refresh");
-  
+
     if (chatId !== undefined) {
       // Retrieve the chat
       async function retrieveChat() {
@@ -66,7 +69,9 @@ export default function Index() {
 
       async function fetchSettings() {
         const savedIp = await getSetting("ip");
+        const autoRename = await getSetting("autoRename");
         setIp(savedIp);
+        setAutoRenameState(stringToBool(autoRename));
       }
       fetchSettings();
     }
@@ -99,20 +104,20 @@ export default function Index() {
       try {
         // Reset the TextInput
         setPrompt("");
-  
+
         // Set loading to disable inputs
         setLoading(true);
-  
+
         // Scroll to the message that was sent
         chatListRef.current.scrollToOffset({ animated: true, offset: 0 });
-  
+
         // Create the user's message object
         const userMessage = {
           role: "user",
           content: prompt,
           date: generateDate(),
         };
-        
+
         setChat([...chat, userMessage]);
 
         // Send the request to the server
@@ -127,12 +132,12 @@ export default function Index() {
             stream: false,
           }),
         });
-  
+
         // Check if the response is successful
         if (!response.ok) {
           throw new Error("Failed to send message.");
         }
-  
+
         // Receive the data from the response
         const data = await response.json();
 
@@ -145,26 +150,65 @@ export default function Index() {
 
         // Update the chat state with the response and user's message
         setChat(prevChat => [...prevChat, assistantMessage]);
-  
+
         // Store the updated chat state
         storeChatMessages(chatId, [...chat, userMessage, assistantMessage]);
 
         // Give haptic feedback
         Vibration.vibrate(1);
-  
+
         // Clear any error message
         setErrorMessage("");
+        if (chat.length === 0 && autoRenameState) {
+          generateChatName(userMessage, assistantMessage);
+        }
       } catch (error) {
         console.error(error);
         setErrorMessage(connErr);
       } finally {
         // Scroll to response
         chatListRef.current.scrollToOffset({ animated: true, offset: 0 });
-  
+
         // Set loading to enable inputs
         setLoading(false);
       }
     }
+  }
+
+  async function generateChatName(userMessage, assistantMessage) {
+    const chatNamePrompt = {
+      role: "user",
+      content: "You are an instruct model. Generate only a name for this conversation in exactly three words or fewer. Respond with no other text beyond the name. Do not explain your choice. No other output except the name is allowed.",
+      date: generateDate(),
+    };
+    
+    const response = await fetch(`http://${ip}/api/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: selectedModel,
+        messages: [userMessage, assistantMessage, chatNamePrompt],
+        stream: false,
+        options: {
+          temperature: 0.2,
+          num_predict: 5,
+          top_k: 10,
+          repeat_penalty: 1.5,
+          presence_penalty: 1.0,
+          frequency_penalty: 0.8,
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to send message.");
+    }
+
+    const data = await response.json();
+
+    renameChat(chatId, data.message.content);
   }
 
   if (chatId === undefined) {
@@ -178,12 +222,12 @@ export default function Index() {
       <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
 
         <ModelList models={models} visibility={visibleModal} onDismiss={hideModal} onPress={setSelectedModel} />
-  
+
         <View style={styles.window}>
           <View style={styles.options}>
             <ModelSelector selectedModel={selectedModel} onPress={showModal} />
           </View>
-  
+
           <View style={styles.chat}>
             <ErrorMessage error={errorMessage} />
             <FlatList
@@ -198,7 +242,7 @@ export default function Index() {
             />
           </View>
         </View>
-  
+
         <View style={styles.controls}>
           <TextInput
             style={styles.input}
@@ -219,7 +263,7 @@ export default function Index() {
             onPress={sendPrompt}
           />
         </View>
-        
+
       </View>
     );
   }
@@ -244,11 +288,11 @@ function ChatBubble({ content, date, role }) {
 
 function FormatMessage(message) {
   const parts = message.split("```");
-  
+
   return parts.map((part, index) => {
     if (index % 2 === 0) {
       const splitText = part.split("**");
-      
+
       return splitText.map((text, textIndex) => {
         let style = styles.bubbleLabel;
         if (textIndex % 2 !== 0) {
