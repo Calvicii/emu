@@ -27,6 +27,7 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.4",
     "expo-web-browser": "~13.0.3",
+    "i18n-js": "^4.4.3",
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-drawer-layout": "^3.3.0",

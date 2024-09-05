@@ -4,6 +4,7 @@ import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal }
 import { useLocalSearchParams } from "expo-router";
 import { getSetting, getChats, storeChatMessages, renameChat } from './storage';
 import { generateDate, stringToBool } from './utils';
+import i18n from '../constants/i18n';
 
 export default function Index() {
 
@@ -46,7 +47,7 @@ export default function Index() {
   const chatListRef = useRef();
 
   // Error messages
-  const connErr = "Connection failed. Make sure the IP address is correct.";
+  const connErr = i18n.t("connectionFailed");
 
   // Refresh the model list and grab the chat from storage
   useEffect(() => {
@@ -215,7 +216,7 @@ export default function Index() {
   if (chatId === undefined) {
     return (
       <View style={styles.noChatView}>
-        <Text style={styles.noChatLabel}>Select or create a chat</Text>
+        <Text style={styles.noChatLabel}>{i18n.t("selectOrCreateAChat")}</Text>
       </View>
     );
   } else {
@@ -230,7 +231,7 @@ export default function Index() {
           </View>
 
           <View style={styles.chat}>
-            <ErrorMessage error={errorMessage} />
+            <ErrorMessage style={styles.errorMessage} error={errorMessage} />
             <FlatList
               inverted
               ref={chatListRef}
@@ -250,7 +251,7 @@ export default function Index() {
             contentStyle={styles.inputValue}
             mode="outlined"
             multiline={true}
-            placeholder={"Message " + selectedModel}
+            placeholder={`${i18n.t("message")} ${selectedModel}`}
             value={prompt}
             disabled={loading}
             onChangeText={(val) => setPrompt(val)}
@@ -345,7 +346,7 @@ function FormatMessage(message) {
 // Button to open the list of models
 function ModelSelector({ selectedModel, onPress }) {
   if (selectedModel === "")
-    selectedModel = "Select a model";
+    selectedModel = i18n.t("selectModel");
   return (
     <Button style={styles.selectedModel} onPress={onPress} labelStyle={styles.selectedModelLabel}>
       {selectedModel}
@@ -360,7 +361,7 @@ function ModelList({ models, visibility, onDismiss, onPress }) {
       <Portal>
         <Modal visible={visibility} onDismiss={onDismiss}>
           <View style={styles.modelList}>
-            <Text style={styles.modelListLabel}>No models available</Text>
+            <Text style={styles.modelListLabel}>{i18n.t("noModels")}</Text>
           </View>
         </Modal>
       </Portal>
@@ -426,11 +427,12 @@ const styles = StyleSheet.create({
   },
   selectedModel: {
     margin: "auto",
-    width: "50%",
+    alignSelf: 'flex-start',
   },
   selectedModelLabel: {
     fontFamily: "Outfit-Medium",
     fontSize: 20,
+    paddingHorizontal: 10,
   },
   modelList: {
     width: "50%",
@@ -522,5 +524,11 @@ const styles = StyleSheet.create({
   noChatLabel: {
     fontSize: 30,
     fontFamily: "Outfit-Regular"
+  },
+  errorMessage: {
+    margin: "auto",
+    width: "80%",
+    textAlign: "center",
+    color: "red",
   }
 });

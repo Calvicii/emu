@@ -7,6 +7,7 @@ import { Link, Stack, router } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { getChats, storeChats, deleteChat, renameChat, getChatName } from './storage';
 import { generateDate, getChatDate, sortChatsFromDates } from './utils';
+import i18n from '../constants/i18n';
 
 const theme = {
   ...MD3DarkTheme,
@@ -150,11 +151,11 @@ export default function RootLayout() {
       let comparedDate = getChatDate(chat[0]);
 
       if (today.getDate() === comparedDate.getDate() && today.getMonth() + 1 === comparedDate.getMonth() && today.getFullYear() == comparedDate.getFullYear()) {
-        return "Today";
+        return i18n.t("today");
       } else if (today.getDate() === comparedDate.getDate() + 1 && today.getMonth() + 1 === comparedDate.getMonth() && today.getFullYear() == comparedDate.getFullYear()) {
-        return "Yesterday";
+        return i18n.t("yesterday");
       } else {
-        return "Once upon a time...";
+        return i18n.t("onceUponATime");
       }
     } else {
       return "";
@@ -234,7 +235,7 @@ export default function RootLayout() {
                     });
                   }}
                 >
-                  New Chat
+                  {i18n.t("newChat")}
                 </Button>
                 <Divider style={styles.divider} />
 
@@ -282,8 +283,8 @@ export default function RootLayout() {
                                 </>
                               }
                             >
-                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title="Rename" leadingIcon="pencil" />
-                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title="Delete" leadingIcon="delete" />
+                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title={i18n.t("rename")} leadingIcon="pencil" />
+                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title={i18n.t("delete")} leadingIcon="delete" />
                             </Menu>
                           </View>
                         )}
@@ -300,7 +301,7 @@ export default function RootLayout() {
                   icon="cog"
                   onPress={() => setOpen(false)}
                 >
-                  Settings
+                  {i18n.t("settings")}
                 </Button>
               </Link>
               <Portal>
@@ -311,7 +312,7 @@ export default function RootLayout() {
                       style={styles.renameInput}
                       contentStyle={styles.renameInputValue}
                       mode="outlined"
-                      label="Rename"
+                      label={i18n.t("rename")}
                       onChangeText={(val) => setNewChatName(val)}
                     />
                     <View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -325,7 +326,7 @@ export default function RootLayout() {
                           setNewChatName("");
                         }}
                       >
-                        Confirm
+                        {i18n.t("confirm")}
                       </Button>
                       <Button
                         style={styles.cancelButton}
@@ -333,7 +334,7 @@ export default function RootLayout() {
                         mode="outlined"
                         onPress={hideRename}
                       >
-                        Cancel
+                        {i18n.t("cancel")}
                       </Button>
                     </View>
                   </View>
@@ -371,7 +372,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="settings"
             options={{
-              title: "Settings",
+              title: i18n.t("settings"),
               statusBarColor: theme.colors.background,
               headerStyle: {
                 backgroundColor: theme.colors.header,

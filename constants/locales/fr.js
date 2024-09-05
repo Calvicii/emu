@@ -1,0 +1,18 @@
+export const fr_ca = {
+    message: "Écrire à",
+    newChat: "Nouvelle conversation",
+    settings: "Réglages",
+    today: "Aujourd'hui",
+    yesterday: "Hier",
+    onceUponATime: "Il y a longtemps...",
+    rename: "Renommer",
+    delete: "Effacer",
+    confirm: "Confirmer",
+    cancel: "Annuler",
+    ollamaServerIP: "Adresse IP du serveur Ollama",
+    autoRename: "Générer les noms des conversations automatiquement",
+    selectModel: "Choisissez un modèle",
+    selectOrCreateAChat: "Sélectionnez ou créez une conversation",
+    noModels: "Aucun modèle disponible",
+    connectionFailed: "Échec de la connexion. Assurez-vous que l'adresse IP est correcte.",
+};

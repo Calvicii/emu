@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { useTheme, TextInput, Switch, Text, Surface } from 'react-native-paper';
 import { getSetting, storeSetting } from './storage';
 import { stringToBool } from './utils';
+import i18n from '../constants/i18n';
 
 export default function Settings() {
 
@@ -42,14 +43,14 @@ export default function Settings() {
       <View style={styles.window}>
         <TextInput
           mode="outlined"
-          label="Ollama Server's IP"
+          label={i18n.t("ollamaServerIP")}
           placeholder="127.0.0.1:11434"
           contentStyle={{ fontFamily: "Outfit-Regular" }}
           value={ip}
           onChangeText={(val) => changeIp(val)}
         />
         <Surface style={styles.autoRenameSurface}>
-          <Text style={styles.autoRenameText}>Generate chat names automatically</Text>
+          <Text style={styles.autoRenameText}>{i18n.t("autoRename")}</Text>
           <Switch value={autoRenameState} onValueChange={() => changeAutoRename(!autoRenameState)} color='' />
         </Surface>
       </View>
