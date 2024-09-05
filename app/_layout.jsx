@@ -17,6 +17,7 @@ const theme = {
     background: '#333',
     header: '#444',
   },
+  version: 3,
 };
 
 export default function RootLayout() {
