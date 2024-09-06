@@ -66,6 +66,8 @@
       "eas": {
         "projectId": "e349c6de-2f65-4c21-b4ac-beb220519572"
       }
-    }
-  }
+    },
+    "sdkVersion": "51.0.0"
+  },
+  "name": "emu"
 }
