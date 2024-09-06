@@ -13,6 +13,4 @@ const traductions = {
 const i18n = new I18n(traductions);
 i18n.locale = NativeModules.I18nManager.localeIdentifier || "en-CA";
 
-console.log(i18n.t("message"));
-
 export default i18n;
