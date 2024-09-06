@@ -53,7 +53,7 @@ export default function RootLayout() {
 
   // For managing visible menu
   const [visibleMenuId, setVisibleMenuId] = useState(null);
-  
+
   // Extra fonts for the app
   const [fontsLoaded] = useFonts({
     'Outfit': require('../assets/fonts/Outfit-VariableFont.ttf'),
@@ -203,6 +203,60 @@ export default function RootLayout() {
   // Close the context menu
   const handleCloseMenu = () => setVisibleMenuId(null);
 
+  function Timeline({ item, lengthOfList }) {
+    if (lengthOfList > 0) {
+      return (
+        <>
+          <Text style={styles.chatTimeStamp}>{generateTimelineLabel(item)}</Text>
+          <FlatList
+            style={styles.chatList}
+            data={[...item].reverse()}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.chatItem}>
+                <Menu
+                  contentStyle={styles.menu}
+                  visible={visibleMenuId === item.id}
+                  onDismiss={handleCloseMenu}
+                  anchor={
+                    <>
+                      <Button
+                        labelStyle={{ fontFamily: "Outfit-Regular" }}
+                        mode="outlined"
+                        textColor={theme.colors.primary}
+                        onLongPress={() => handleLongPress(item.id)}
+                        onPress={() => {
+                          setOpen(false);
+                          setCurrentChatId(item.id);
+                          async function setCurrentName() {
+                            let name = await getChatName(item.id);
+                            setCurrentChatName(name);
+                          }
+                          setCurrentName();
+                          router.navigate({
+                            pathname: "",
+                            params: {
+                              chatId: item.id,
+                            }
+                          });
+                        }}
+                      >
+                        {item.name}
+                      </Button>
+                    </>
+                  }
+                >
+                  <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title={i18n.t("rename")} leadingIcon="pencil" />
+                  <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title={i18n.t("delete")} leadingIcon="delete" />
+                </Menu>
+              </View>
+            )}
+          />
+        </>
+      );
+    }
+  }
+
   return (
     <PaperProvider theme={theme}>
       <Drawer
@@ -243,54 +297,8 @@ export default function RootLayout() {
                 <FlatList
                   style={styles.chatList}
                   data={sortedChats}
-                  renderItem={({ item }) => (
-                    <>
-                      <Text style={styles.chatTimeStamp}>{generateTimelineLabel(item)}</Text>
-                      <FlatList
-                        style={styles.chatList}
-                        data={[...item].reverse()}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                          <View style={styles.chatItem}>
-                            <Menu
-                            contentStyle={styles.menu}
-                              visible={visibleMenuId === item.id}
-                              onDismiss={handleCloseMenu}
-                              anchor={
-                                <>
-                                  <Button
-                                    labelStyle={{ fontFamily: "Outfit-Regular" }}
-                                    mode="outlined"
-                                    textColor={theme.colors.primary}
-                                    onLongPress={() => handleLongPress(item.id)}
-                                    onPress={() => {
-                                      setOpen(false);
-                                      setCurrentChatId(item.id);
-                                      async function setCurrentName() {
-                                        let name = await getChatName(item.id);
-                                        setCurrentChatName(name);
-                                      }
-                                      setCurrentName();
-                                      router.navigate({
-                                        pathname: "",
-                                        params: {
-                                          chatId: item.id,
-                                        }
-                                      });
-                                    }}
-                                  >
-                                    {item.name}
-                                  </Button>
-                                </>
-                              }
-                            >
-                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => showRename(item.id)} title={i18n.t("rename")} leadingIcon="pencil" />
-                              <Menu.Item titleStyle={styles.menuItemLabel} onPress={() => handleDeleteChat(item.id)} title={i18n.t("delete")} leadingIcon="delete" />
-                            </Menu>
-                          </View>
-                        )}
-                      />
-                    </>
+                  renderItem={({ item, index }) => (
+                    <Timeline item={item} lengthOfList={sortedChats[index].length} />
                   )}
                 />
               </View>
