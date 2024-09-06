@@ -43,9 +43,9 @@ export default function Settings() {
       <View style={styles.window}>
         <TextInput
           mode="outlined"
-          label={i18n.t("ollamaServerIP")}
+          label={<Text style={styles.ipLabel}>{i18n.t("ollamaServerIP")}</Text>}
           placeholder="127.0.0.1:11434"
-          contentStyle={{ fontFamily: "Outfit-Regular" }}
+          contentStyle={styles.ipLabel}
           value={ip}
           onChangeText={(val) => changeIp(val)}
         />
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   autoRenameSurface: {
     margin: 10,
-    paddingHorizontal: 10,
+    padding: 10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-evenly",
@@ -75,5 +75,8 @@ const styles = StyleSheet.create({
   autoRenameText: {
     fontFamily: "Outfit-Regular",
     fontSize: 16,
+  },
+  ipLabel: {
+    fontFamily: "Outfit-Regular",
   }
 });
