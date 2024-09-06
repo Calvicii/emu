@@ -44,7 +44,7 @@ export default function Settings() {
         <TextInput
           mode="outlined"
           label={<Text style={styles.ipLabel}>{i18n.t("ollamaServerIP")}</Text>}
-          placeholder="127.0.0.1:11434"
+          placeholder="http://127.0.0.1:11434"
           contentStyle={styles.ipLabel}
           value={ip}
           onChangeText={(val) => changeIp(val)}

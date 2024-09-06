@@ -81,7 +81,7 @@ export default function Index() {
   // Grab the models available on the machine
   async function getModels() {
     try {
-      const response = await fetch(`http://${ip}/api/tags`);
+      const response = await fetch(`${ip}/api/tags`);
       const data = await response.json();
       setModels(data.models);
 
@@ -126,7 +126,7 @@ export default function Index() {
         storeChatMessages(chatId, [...chat, userMessage]);
 
         // Send the request to the server
-        const response = await fetch(`http://${ip}/api/chat`, {
+        const response = await fetch(`${ip}/api/chat`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -188,7 +188,7 @@ export default function Index() {
       date: generateDate(),
     };
     
-    const response = await fetch(`http://${ip}/api/chat`, {
+    const response = await fetch(`${ip}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
