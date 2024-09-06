@@ -257,14 +257,14 @@ export default function Index() {
             multiline={true}
             placeholder={`${i18n.t("message")} ${selectedModel}`}
             value={prompt}
-            disabled={loading}
+            disabled={loading || selectedModel === ""}
             onChangeText={(val) => setPrompt(val)}
           />
           <IconButton
             style={styles.sendButton}
             mode="contained"
             icon="arrow-up"
-            disabled={loading}
+            disabled={loading || selectedModel === ""}
             loading={loading}
             onPress={sendPrompt}
           />
