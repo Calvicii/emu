@@ -119,7 +119,11 @@ export default function Index() {
           date: generateDate(),
         };
 
+        // Update the chat state with the user's message
         setChat([...chat, userMessage]);
+
+        // Store the updated chat state
+        storeChatMessages(chatId, [...chat, userMessage]);
 
         // Send the request to the server
         const response = await fetch(`http://${ip}/api/chat`, {
@@ -150,7 +154,7 @@ export default function Index() {
           model: selectedModel,
         };
 
-        // Update the chat state with the response and user's message
+        // Update the chat state with the response
         setChat(prevChat => [...prevChat, assistantMessage]);
 
         // Store the updated chat state
