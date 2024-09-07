@@ -1,15 +1,26 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, FlatList, Vibration } from 'react-native';
-import { useTheme, TextInput, Text, IconButton, Button, Surface, Portal, Modal } from 'react-native-paper';
+import React, { useEffect, useState, useRef } from "react";
+import { View, StyleSheet, FlatList, Vibration } from "react-native";
+import {
+  useTheme,
+  TextInput,
+  Text,
+  IconButton,
+  Button,
+  Surface,
+  Portal,
+  Modal,
+} from "react-native-paper";
 import { useLocalSearchParams } from "expo-router";
-import { getSetting, getChats, storeChatMessages, renameChat } from './storage';
-import { generateDate, stringToBool } from './utils';
-import i18n from '../constants/i18n';
+import { getSetting, getChats, storeChatMessages, renameChat } from "./storage";
+import { generateDate, stringToBool } from "./utils";
+import i18n from "../constants/i18n";
 
 export default function Index() {
-
   // Get the selected chat's ID
   const { chatId } = useLocalSearchParams();
+
+  // Reference to currentChatId so it can change during prompt sending
+  const currentChatIdRef = useRef(chatId);
 
   // For global theming
   const theme = useTheme();
@@ -57,7 +68,9 @@ export default function Index() {
       // Retrieve the chat
       async function retrieveChat() {
         const chats = await getChats();
-        const chatIndex = chats.findIndex(chat => chat.id === parseInt(chatId));
+        const chatIndex = chats.findIndex(
+          (chat) => chat.id === parseInt(chatId)
+        );
         if (chatIndex !== -1) {
           const messages = chats[chatIndex].messages;
           setChat(messages);
@@ -78,6 +91,11 @@ export default function Index() {
     }
   }, [chatId, visibleModal]);
 
+  // Update the reference to currentChatId
+  useEffect(() => {
+    currentChatIdRef.current = chatId;
+  }, [chatId]);
+
   // Grab the models available on the machine
   async function getModels() {
     try {
@@ -86,13 +104,11 @@ export default function Index() {
       setModels(data.models);
 
       // Deselect the current model if it is not available on the server
-      let containsModel = false
+      let containsModel = false;
       for (let i = 0; i < data.models.length; ++i)
-        if (data.models[i].name === selectedModel)
-          containsModel = true;
+        if (data.models[i].name === selectedModel) containsModel = true;
       if (!containsModel) setSelectedModel("");
       setErrorMessage("");
-
     } catch (error) {
       setErrorMessage(connErr);
       setModels("");
@@ -154,8 +170,10 @@ export default function Index() {
           model: selectedModel,
         };
 
-        // Update the chat state with the response
-        setChat(prevChat => [...prevChat, assistantMessage]);
+        // Update the chat state with the response if the user is still in the same chat
+        if (currentChatIdRef.current === chatId) {
+          setChat((prevChat) => [...prevChat, assistantMessage]);
+        }
 
         // Store the updated chat state
         storeChatMessages(chatId, [...chat, userMessage, assistantMessage]);
@@ -184,10 +202,11 @@ export default function Index() {
   async function generateChatName(userMessage, assistantMessage) {
     const chatNamePrompt = {
       role: "user",
-      content: "You are an instruct model. Generate only a name for this conversation in exactly three words or fewer. Respond with no other text beyond the name. Do not explain your choice. No other output except the name is allowed.",
+      content:
+        "You are an instruct model. Generate only a name for this conversation in exactly three words or fewer. Respond with no other text beyond the name. Do not explain your choice. No other output except the name is allowed.",
       date: generateDate(),
     };
-    
+
     const response = await fetch(`${ip}/api/chat`, {
       method: "POST",
       headers: {
@@ -204,7 +223,7 @@ export default function Index() {
           repeat_penalty: 1.5,
           presence_penalty: 1.0,
           frequency_penalty: 0.8,
-        }
+        },
       }),
     });
 
@@ -226,8 +245,12 @@ export default function Index() {
   } else {
     return (
       <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
-
-        <ModelList models={models} visibility={visibleModal} onDismiss={hideModal} onPress={setSelectedModel} />
+        <ModelList
+          models={models}
+          visibility={visibleModal}
+          onDismiss={hideModal}
+          onPress={setSelectedModel}
+        />
 
         <View style={styles.window}>
           <View style={styles.options}>
@@ -242,7 +265,14 @@ export default function Index() {
               data={[...chat].reverse()}
               renderItem={({ item }) => {
                 if (item !== undefined) {
-                  return <ChatBubble content={item.content} date={item.date} role={item.role} model={item.model} />;
+                  return (
+                    <ChatBubble
+                      content={item.content}
+                      date={item.date}
+                      role={item.role}
+                      model={item.model}
+                    />
+                  );
                 }
               }}
             />
@@ -269,7 +299,6 @@ export default function Index() {
             onPress={sendPrompt}
           />
         </View>
-
       </View>
     );
   }
@@ -292,7 +321,9 @@ function ChatBubble({ content, date, role, model }) {
 
   return (
     <Surface style={style} mode={mode}>
-      <Text style={styles.bubbleLabel} selectable>{FormatMessage(content)}</Text>
+      <Text style={styles.bubbleLabel} selectable>
+        {FormatMessage(content)}
+      </Text>
       <Text style={styles.bubbleTimeStamp}>{date}</Text>
       {modelName}
     </Surface>
@@ -311,21 +342,15 @@ function FormatMessage(message) {
         if (textIndex % 2 !== 0) {
           style = styles.bubbleLabelBold;
         }
-        return (
-          <Text style={style}>
-            {text}
-          </Text>
-        );
+        return <Text style={style}>{text}</Text>;
       });
     } else {
-      const languageNameSplit = part.split('\n')[0];
+      const languageNameSplit = part.split("\n")[0];
       if (languageNameSplit !== "") {
         return (
           <View style={styles.namedCodeBlock}>
             <Surface style={styles.bubbleLabelCodeTitle}>
-              <Text style={styles.bubbleLabelBold}>
-                {languageNameSplit}
-              </Text>
+              <Text style={styles.bubbleLabelBold}>{languageNameSplit}</Text>
             </Surface>
             <Surface style={styles.bubbleLabelCode}>
               <Text style={styles.bubbleLabelCode}>
@@ -337,22 +362,22 @@ function FormatMessage(message) {
       }
       return (
         <Surface style={styles.bubbleLabelLonelyCode}>
-          <Text style={styles.bubbleLabelCode}>
-            {part.trim()}
-          </Text>
+          <Text style={styles.bubbleLabelCode}>{part.trim()}</Text>
         </Surface>
       );
     }
   });
 }
 
-
 // Button to open the list of models
 function ModelSelector({ selectedModel, onPress }) {
-  if (selectedModel === "")
-    selectedModel = i18n.t("selectModel");
+  if (selectedModel === "") selectedModel = i18n.t("selectModel");
   return (
-    <Button style={styles.selectedModel} onPress={onPress} labelStyle={styles.selectedModelLabel}>
+    <Button
+      style={styles.selectedModel}
+      onPress={onPress}
+      labelStyle={styles.selectedModelLabel}
+    >
       {selectedModel}
     </Button>
   );
@@ -397,8 +422,7 @@ function ModelList({ models, visibility, onDismiss, onPress }) {
 }
 
 function ErrorMessage({ error }) {
-  if (error !== "")
-    return <Text style={styles.errorMessage}>{error}</Text>;
+  if (error !== "") return <Text style={styles.errorMessage}>{error}</Text>;
   return <></>;
 }
 
@@ -411,7 +435,7 @@ const styles = StyleSheet.create({
     flex: 0,
     paddingVertical: 10,
     borderBottomWidth: 2,
-    borderColor: "white"
+    borderColor: "white",
   },
   controls: {
     flexDirection: "row",
@@ -431,7 +455,7 @@ const styles = StyleSheet.create({
   },
   selectedModel: {
     margin: "auto",
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   selectedModelLabel: {
     fontFamily: "Outfit-Medium",
@@ -442,7 +466,7 @@ const styles = StyleSheet.create({
     width: "50%",
     margin: "auto",
     padding: 10,
-    backgroundColor: '#444',
+    backgroundColor: "#444",
     borderRadius: 10,
   },
   modelListLabel: {
@@ -478,7 +502,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
-    backgroundColor: "#222"
+    backgroundColor: "#222",
   },
   bubbleLabelCode: {
     fontFamily: "RobotoMono-Regular",
@@ -487,7 +511,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderBottomLeftRadius: 6,
     borderBottomRightRadius: 6,
-    backgroundColor: "#222"
+    backgroundColor: "#222",
   },
   bubbleLabelCodeTitle: {
     fontFamily: "RobotoMono-Regular",
@@ -496,10 +520,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
-    backgroundColor: "#444"
+    backgroundColor: "#444",
   },
   namedCodeBlock: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   bubbleTimeStamp: {
     marginTop: 10,
@@ -517,7 +541,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: 14,
     textAlign: "center",
-    color: "red"
+    color: "red",
   },
   noChatView: {
     flex: 1,
@@ -527,12 +551,12 @@ const styles = StyleSheet.create({
   },
   noChatLabel: {
     fontSize: 30,
-    fontFamily: "Outfit-Regular"
+    fontFamily: "Outfit-Regular",
   },
   errorMessage: {
     margin: "auto",
     width: "80%",
     textAlign: "center",
     color: "red",
-  }
+  },
 });
