@@ -10,6 +10,7 @@ import {
   Portal,
   Modal,
 } from "react-native-paper";
+import Markdown from "react-native-markdown-display";
 import { useLocalSearchParams } from "expo-router";
 import { getSetting, getChats, storeChatMessages, renameChat } from "./storage";
 import { generateDate, stringToBool } from "./utils";
@@ -336,52 +337,11 @@ function ChatBubble({ content, date, role, model }) {
 
   return (
     <Surface style={style} mode={mode}>
-      <Text style={styles.bubbleLabel} selectable>
-        {FormatMessage(content)}
-      </Text>
+      <Markdown style={markdownStyles}>{content}</Markdown>
       <Text style={styles.bubbleTimeStamp}>{date}</Text>
       {modelName}
     </Surface>
   );
-}
-
-function FormatMessage(message) {
-  const parts = message.split("```");
-
-  return parts.map((part, index) => {
-    if (index % 2 === 0) {
-      const splitText = part.split("**");
-
-      return splitText.map((text, textIndex) => {
-        let style = styles.bubbleLabel;
-        if (textIndex % 2 !== 0) {
-          style = styles.bubbleLabelBold;
-        }
-        return <Text style={style}>{text}</Text>;
-      });
-    } else {
-      const languageNameSplit = part.split("\n")[0];
-      if (languageNameSplit !== "") {
-        return (
-          <View style={styles.namedCodeBlock}>
-            <Surface style={styles.bubbleLabelCodeTitle}>
-              <Text style={styles.bubbleLabelBold}>{languageNameSplit}</Text>
-            </Surface>
-            <Surface style={styles.bubbleLabelCode}>
-              <Text style={styles.bubbleLabelCode}>
-                {part.split(languageNameSplit)[1].trim()}
-              </Text>
-            </Surface>
-          </View>
-        );
-      }
-      return (
-        <Surface style={styles.bubbleLabelLonelyCode}>
-          <Text style={styles.bubbleLabelCode}>{part.trim()}</Text>
-        </Surface>
-      );
-    }
-  });
 }
 
 // Button to open the list of models
@@ -506,41 +466,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#444",
   },
-  bubbleLabel: {
-    fontFamily: "Outfit-Regular",
-  },
-  bubbleLabelBold: {
-    fontFamily: "Outfit-Bold",
-  },
-  bubbleLabelLonelyCode: {
-    fontFamily: "RobotoMono-Regular",
-    fontSize: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: "#222",
-  },
-  bubbleLabelCode: {
-    fontFamily: "RobotoMono-Regular",
-    fontSize: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderBottomLeftRadius: 6,
-    borderBottomRightRadius: 6,
-    backgroundColor: "#222",
-  },
-  bubbleLabelCodeTitle: {
-    fontFamily: "RobotoMono-Regular",
-    fontSize: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6,
-    backgroundColor: "#444",
-  },
-  namedCodeBlock: {
-    flexDirection: "column",
-  },
   bubbleTimeStamp: {
     marginTop: 10,
     fontFamily: "Outfit-Regular",
@@ -576,11 +501,32 @@ const styles = StyleSheet.create({
     color: "red",
   },
   downButton: {
-    position: 'absolute',
+    position: "absolute",
     alignSelf: "flex-end",
     borderRadius: 10,
     bottom: 0,
     right: 10,
     zIndex: 10,
+  },
+});
+
+const markdownStyles = StyleSheet.create({
+  body: {
+    color: "white",
+    fontFamily: "Outfit-Regular",
+  },
+  paragraph: {
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  code_block: {
+    backgroundColor: "transparent",
+  },
+  code_inline: {
+    backgroundColor: "transparent",
+  },
+  fence: {
+    marginVertical: 10,
+    backgroundColor: "transparent",
   },
 });
