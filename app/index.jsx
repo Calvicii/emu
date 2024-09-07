@@ -523,7 +523,7 @@ const markdownStyles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   code_inline: {
-    backgroundColor: "transparent",
+    backgroundColor: "#fff2",
   },
   fence: {
     marginVertical: 10,
