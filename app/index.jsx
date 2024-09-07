@@ -11,6 +11,8 @@ import {
   Modal,
 } from "react-native-paper";
 import Markdown from "react-native-markdown-display";
+import markdownRules from "../constants/markdownRules";
+import markdownStyles from "../constants/markdownStyles";
 import { useLocalSearchParams } from "expo-router";
 import { getSetting, getChats, storeChatMessages, renameChat } from "./storage";
 import { generateDate, stringToBool } from "./utils";
@@ -271,6 +273,7 @@ export default function Index() {
               inverted
               ref={chatListRef}
               data={[...chat].reverse()}
+              keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => {
                 if (item !== undefined) {
                   return (
@@ -283,6 +286,9 @@ export default function Index() {
                   );
                 }
               }}
+              initialNumToRender={10}
+              maxToRenderPerBatch={5}
+              windowSize={5}
               onScroll={handleScroll}
               scrollEventThrottle={16}
             />
@@ -337,7 +343,9 @@ function ChatBubble({ content, date, role, model }) {
 
   return (
     <Surface style={style} mode={mode}>
-      <Markdown style={markdownStyles}>{content}</Markdown>
+      <Markdown style={markdownStyles} rules={markdownRules}>
+        {content}
+      </Markdown>
       <Text style={styles.bubbleTimeStamp}>{date}</Text>
       {modelName}
     </Surface>
@@ -507,26 +515,5 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 10,
     zIndex: 10,
-  },
-});
-
-const markdownStyles = StyleSheet.create({
-  body: {
-    color: "white",
-    fontFamily: "Outfit-Regular",
-  },
-  paragraph: {
-    marginTop: 0,
-    marginBottom: 0,
-  },
-  code_block: {
-    backgroundColor: "transparent",
-  },
-  code_inline: {
-    backgroundColor: "#fff2",
-  },
-  fence: {
-    marginVertical: 10,
-    backgroundColor: "transparent",
   },
 });
