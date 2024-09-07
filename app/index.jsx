@@ -60,6 +60,13 @@ export default function Index() {
   // Error messages
   const connErr = i18n.t("connectionFailed");
 
+  // Down button visibility
+  const [showDownButton, setShowDownButton] = useState(true);
+  const handleScroll = (event) => {
+    const { contentOffset } = event.nativeEvent;
+    setShowDownButton(contentOffset.y > 100);
+  };
+
   // Refresh the model list and grab the chat from storage
   useEffect(() => {
     console.log("refresh");
@@ -275,8 +282,16 @@ export default function Index() {
                   );
                 }
               }}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
             />
           </View>
+          <IconButton
+            style={[styles.downButton, !showDownButton && { opacity: 0 }]}
+            mode="contained"
+            icon="arrow-down"
+            onPress={() => chatListRef.current.scrollToOffset(0)}
+          />
         </View>
 
         <View style={styles.controls}>
@@ -294,7 +309,7 @@ export default function Index() {
             style={styles.sendButton}
             mode="contained"
             icon="arrow-up"
-            disabled={loading || selectedModel === ""}
+            disabled={loading || selectedModel === "" || prompt === ""}
             loading={loading}
             onPress={sendPrompt}
           />
@@ -441,6 +456,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
+    backgroundColor: "#333",
   },
   input: {
     flex: 1,
@@ -558,5 +574,13 @@ const styles = StyleSheet.create({
     width: "80%",
     textAlign: "center",
     color: "red",
+  },
+  downButton: {
+    position: 'absolute',
+    alignSelf: "flex-end",
+    borderRadius: 10,
+    bottom: 0,
+    right: 10,
+    zIndex: 10,
   },
 });
