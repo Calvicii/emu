@@ -64,7 +64,7 @@ export default function Index() {
   const connErr = i18n.t("connectionFailed");
 
   // Down button visibility
-  const [showDownButton, setShowDownButton] = useState(true);
+  const [showDownButton, setShowDownButton] = useState(false);
   const handleScroll = (event) => {
     const { contentOffset } = event.nativeEvent;
     setShowDownButton(contentOffset.y > 100);
