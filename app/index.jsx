@@ -99,6 +99,8 @@ export default function Index() {
       }
       fetchSettings();
     }
+
+    return setShowDownButton(false);
   }, [chatId, visibleModal]);
 
   // Update the reference to currentChatId
@@ -342,18 +344,19 @@ function ChatBubble({ content, date, role, model }) {
   }
 
   return (
-    <Surface style={style} mode={mode}>
-      <Pressable
-        onLongPress={() => {
-          Clipboard.setStringAsync(content);
-          Vibration.vibrate(1);
-        }}
-      >
+    <Pressable
+      android_ripple={{ color: "#fff2" }}
+      onLongPress={() => {
+        Clipboard.setStringAsync(content);
+        Vibration.vibrate(1);
+      }}
+    >
+      <Surface style={style} mode={mode}>
         <Markdown style={markdownStyles}>{content}</Markdown>
         <Text style={styles.bubbleTimeStamp}>{date}</Text>
         {modelName}
-      </Pressable>
-    </Surface>
+      </Surface>
+    </Pressable>
   );
 }
 
