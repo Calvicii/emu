@@ -138,7 +138,7 @@ export default function App() {
       name: "New Chat",
       date: generateDate(),
       messages: [],
-    }); //TODO
+    });
     await storeChats(chats);
     setChats(chats);
     return newChatId;

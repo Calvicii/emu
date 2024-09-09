@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, FlatList, Vibration } from "react-native";
+import { View, StyleSheet, FlatList, Vibration, Pressable } from "react-native";
 import {
   useTheme,
   TextInput,
@@ -11,9 +11,9 @@ import {
   Modal,
 } from "react-native-paper";
 import Markdown from "react-native-markdown-display";
-import markdownRules from "../constants/markdownRules";
 import markdownStyles from "../constants/markdownStyles";
 import { useLocalSearchParams } from "expo-router";
+import * as Clipboard from "expo-clipboard";
 import { getSetting, getChats, storeChatMessages, renameChat } from "./storage";
 import { generateDate, stringToBool } from "./utils";
 import i18n from "../constants/i18n";
@@ -343,11 +343,16 @@ function ChatBubble({ content, date, role, model }) {
 
   return (
     <Surface style={style} mode={mode}>
-      <Markdown style={markdownStyles} rules={markdownRules}>
-        {content}
-      </Markdown>
-      <Text style={styles.bubbleTimeStamp}>{date}</Text>
-      {modelName}
+      <Pressable
+        onLongPress={() => {
+          Clipboard.setStringAsync(content);
+          Vibration.vibrate(1);
+        }}
+      >
+        <Markdown style={markdownStyles}>{content}</Markdown>
+        <Text style={styles.bubbleTimeStamp}>{date}</Text>
+        {modelName}
+      </Pressable>
     </Surface>
   );
 }
