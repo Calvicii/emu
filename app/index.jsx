@@ -288,11 +288,12 @@ export default function Index() {
                   );
                 }
               }}
-              initialNumToRender={10}
+              initialNumToRender={5}
               maxToRenderPerBatch={5}
-              windowSize={5}
+              windowSize={10}
               onScroll={handleScroll}
               scrollEventThrottle={16}
+              removeClippedSubviews={true}
             />
           </View>
           <IconButton
@@ -394,7 +395,7 @@ function ModelList({ models, visibility, onDismiss, onPress }) {
         <FlatList
           style={styles.modelList}
           data={models}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <Button
               labelStyle={styles.modelListLabel}
@@ -406,6 +407,9 @@ function ModelList({ models, visibility, onDismiss, onPress }) {
               {item.name}
             </Button>
           )}
+          initialNumToRender={5}
+          maxToRenderPerBatch={5}
+          windowSize={10}
         />
       </Modal>
     </Portal>

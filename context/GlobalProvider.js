@@ -1,8 +1,8 @@
 import GlobalContext from './GlobalContext';
 
-export const GlobalProvider = ({ children }) => {
+export const GlobalProvider = ({ children, value }) => {
     return (
-        <GlobalContext.Provider>
+        <GlobalContext.Provider value={value}>
             {children}
         </GlobalContext.Provider>
     );
